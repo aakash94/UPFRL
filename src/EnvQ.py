@@ -1,12 +1,11 @@
 import gym
 import random
-from gym.utils import seeding
 
 
 class EnvQ(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, max_state=100, min_state=0, action_size=2, timestep_limit=1073741824, seed = 42):
+    def __init__(self, max_state=100, min_state=0, action_size=2, timestep_limit=1073741824, seed=42):
         random.seed(seed)
 
         self.timestep_limit = timestep_limit
