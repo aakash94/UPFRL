@@ -47,6 +47,7 @@ class EnvQ(gym.Env):
     def reset(self):
         self.state = random.randint(0, 99)
         self.timestep_count = 0
+        return self.state
 
     def render(self, mode="human"):
         print(self.state)
