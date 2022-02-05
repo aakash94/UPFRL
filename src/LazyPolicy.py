@@ -13,7 +13,8 @@ class LazyPolicy:
 
 if __name__ == '__main__':
     env = EnvQ()
-    state = env.render()
+    state = env.reset()
+    env.render()
     policy = LazyPolicy()
     env.step(policy.act(state))
     env.render()
