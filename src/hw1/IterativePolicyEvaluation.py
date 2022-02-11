@@ -10,8 +10,13 @@ class IterativePolicyEvaluation:
         init_vals = [-np.inf] * env.max_length
         self.value_function = dict(zip(states, init_vals))
 
-    def evaluate(self):
-        delta = np.inf
-        while delta > self.theta:
-            for state in self.value_function:
-                pass
+    def evaluate(self, pi, gamma, V):
+        while True:
+            delta = 0
+            for s in env.S:
+                v = V[s]
+                bellman_update(env, V, pi, s, gamma)
+                delta = max(delta, abs(v - V[s]))
+            if delta < theta:
+                break
+        return V
