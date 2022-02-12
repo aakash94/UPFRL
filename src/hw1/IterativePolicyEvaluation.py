@@ -1,22 +1,29 @@
 from EnvQ import EnvQ
 import numpy as np
-
+from matplotlib import pyplot as plt
 
 class IterativePolicyEvaluation:
 
-    def __init__(self, env: EnvQ, theta=0.0001):
+    def __init__(self, env: EnvQ, theta=0.001):
+        self.env = env
         self.theta = theta
-        states = list(range(env.max_length))
-        init_vals = [-np.inf] * env.max_length
-        self.value_function = dict(zip(states, init_vals))
 
-    def evaluate(self, pi, gamma, V):
+
+    def evaluate(self, policy, gamma):
+        V = np.zeros(self.env.max_length)
         while True:
             delta = 0
-            for s in env.S:
-                v = V[s]
-                bellman_update(env, V, pi, s, gamma)
-                delta = max(delta, abs(v - V[s]))
-            if delta < theta:
+            for s in range(self.env.max_length):
+                Vs = 0
+                for a, action_prob in enumerate(policy[s]):
+                    for prob, next_state, reward, done in self.env.transition[s][a]:
+                        Vs += action_prob * prob * (reward + gamma * V[next_state])
+                delta = max(delta, np.abs(V[s] - Vs))
+                V[s] = Vs
+            if delta < self.theta:
                 break
         return V
+
+    def plot_value_function(self, V):
+        plt.plot(V)
+        plt.show()

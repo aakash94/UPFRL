@@ -39,7 +39,10 @@ class EnvQ(gym.Env):
                 increment_p = arrival_rate * (1 - service_rate)
                 same_p = (service_rate * arrival_rate) + ((1 - service_rate) * (1 - arrival_rate))
 
-                increment_tuple = (increment_p, s + 1, reward, False)
+                if s + 1 >= 100:
+                    increment_tuple = (increment_p, s, reward, False)
+                else:
+                    increment_tuple = (increment_p, s, reward, False)
 
                 if s - 1 <= 0:
                     decrement_tuple = (decrement_p, s - 1, reward, True)

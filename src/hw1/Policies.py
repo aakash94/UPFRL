@@ -1,4 +1,5 @@
 from EnvQ import EnvQ
+from IterativePolicyEvaluation import IterativePolicyEvaluation
 import random
 import numpy as np
 
@@ -6,6 +7,7 @@ ACTION_LOW = 0
 ACTION_HIGH = 1
 NUM_ACTION = 2
 STATE_SIZE = 100
+DISCOUNT_FACTOR = 0.9
 
 
 def get_aggressive_policy(threshold=50):
@@ -45,9 +47,11 @@ class Policy:
 if __name__ == '__main__':
     lp = get_lazy_policy()
     ap = get_aggressive_policy()
-    state = 10
-    action = ACTION_LOW
-    # print(ap)
-    # print(ap[state, action])
-    # print(ap[50, action])
-    get_action(pi=ap, state=60)
+    env = EnvQ()
+    ipe = IterativePolicyEvaluation(env=env)
+
+    v = ipe.evaluate(policy=lp, gamma=DISCOUNT_FACTOR)
+    ipe.plot_value_function(v)
+
+    v = ipe.evaluate(policy=ap, gamma=DISCOUNT_FACTOR)
+    ipe.plot_value_function(v)
