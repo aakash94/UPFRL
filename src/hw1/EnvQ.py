@@ -14,6 +14,7 @@ class EnvQ(gym.Env):
         self.min_length = min_state
         self.state = random.randint(0, 99)
 
+        self.actions = [0, 1]
         self.action_low = 0
         self.action_high = 1
 
@@ -22,26 +23,66 @@ class EnvQ(gym.Env):
 
         self.timestep_count = 0
 
+        self.transition = self.get_env_dynamic()
+
+    def get_env_dynamic(self):
+        p = {}
+        for s in range(self.min_length, self.max_length):
+            p[s] = {}
+            for a in self.actions:
+                reward = 0 - (((s / self.max_length) ** 2) + (self.cost_action[a]))
+
+                arrival_rate = 0.5
+                service_rate = self.q_action[a]
+
+                decrement_p = service_rate * (1 - arrival_rate)
+                increment_p = arrival_rate * (1 - service_rate)
+                same_p = (service_rate * arrival_rate) + ((1 - service_rate) * (1 - arrival_rate))
+
+                increment_tuple = (increment_p, s + 1, reward, False)
+
+                if s - 1 <= 0:
+                    decrement_tuple = (decrement_p, s - 1, reward, True)
+                else:
+                    decrement_tuple = (decrement_p, s - 1, reward, False)
+
+                if s <= 0:
+                    same_tuple = (same_p, s, reward, True)
+                else:
+                    same_tuple = (same_p, s, reward, False)
+
+                p[s][a] = [decrement_tuple, same_tuple, increment_tuple]
+
+        return p
+
     def step(self, action: int):
         self.timestep_count += 1
         done = False
         new_state = self.state
 
+        tuples = self.transition[self.state][action]
+        d_prob, d_next_state, d_reward, d_done = tuples[0]
+        s_prob, s_next_state, s_reward, s_done = tuples[1]
+        i_prob, i_next_state, i_reward, i_done = tuples[2]
+
+        random_val = random.random()
+
+        if random_val < d_prob:
+            reward = d_reward
+            new_state = d_next_state
+            done = d_done
+        elif random_val >= d_prob and random_val < d_prob + s_prob:
+            reward = s_reward
+            new_state = s_next_state
+            done = s_done
+        else:
+            reward = i_reward
+            new_state = i_next_state
+            done = i_done
+
         if self.timestep_count == self.timestep_limit:
             done = True
 
-        reward = 0 - (((self.state / self.max_length) ** 2) + (self.cost_action[action]))
-
-        arrival_rate = 0.5
-        service_rate = self.q_action[action]
-
-        if random.random() < arrival_rate:
-            new_state += 1
-
-        if random.random() < service_rate:
-            new_state -= 1
-
-        new_state = max(min(new_state, self.max_length), self.min_length)
         self.state = new_state
         return self.state, reward, done, {}
 
@@ -64,3 +105,6 @@ if __name__ == '__main__':
     env.render()
     env.step(env.action_high)
     env.render()
+
+    # print()
+    # print(env.transition)
