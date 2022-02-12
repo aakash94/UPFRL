@@ -54,14 +54,20 @@ if __name__ == '__main__':
     ipe = IterativePolicyEvaluation(env=env)
 
     v_lazy = ipe.evaluate(policy=lp, gamma=DISCOUNT_FACTOR)
-    #ipe.plot_value_function(v_lazy)
-    print(v_lazy)
+    # ipe.plot_value_function(v_lazy)
+    # print(v_lazy)
 
     v_aggressive = ipe.evaluate(policy=ap, gamma=DISCOUNT_FACTOR)
     #ipe.plot_value_function(v_aggressive)
-    print(v_aggressive)
-    plt.plot(v_lazy, label = "lazy")
-    plt.plot(v_aggressive, label = "aggressive")
-    plt.legend()
-    plt.show()
+    # print(v_aggressive)
+    # plt.plot(v_lazy, label = "lazy")
+    # plt.plot(v_aggressive, label = "aggressive")
+    # plt.legend()
+    # plt.show()
+
+    zip_object = zip(v_lazy, v_aggressive)
+    difference = []
+    for v_l, v_a in zip_object:
+        difference.append(v_l - v_a)
+    ipe.plot_value_function(difference)
 
