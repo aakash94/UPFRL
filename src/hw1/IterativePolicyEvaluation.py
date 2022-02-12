@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 class IterativePolicyEvaluation:
 
-    def __init__(self, env: EnvQ, theta=0.001):
+    def __init__(self, env: EnvQ, theta=0.00001):
         self.env = env
         self.theta = theta
 

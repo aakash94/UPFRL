@@ -49,7 +49,7 @@ if __name__ == '__main__':
     lp = get_lazy_policy()
     ap = get_aggressive_policy()
 
-    print(lp, ap)
+    #print(lp, ap)
     env = EnvQ()
     ipe = IterativePolicyEvaluation(env=env)
 
