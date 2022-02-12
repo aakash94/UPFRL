@@ -25,5 +25,5 @@ class IterativePolicyEvaluation:
         return V
 
     def plot_value_function(self, V):
-        plt.plot(V)
+        plt.bar(range(len(V)),V)
         plt.show()
