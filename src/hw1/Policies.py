@@ -2,6 +2,7 @@ from EnvQ import EnvQ
 from IterativePolicyEvaluation import IterativePolicyEvaluation
 import random
 import numpy as np
+from matplotlib import pyplot as plt
 
 ACTION_LOW = 0
 ACTION_HIGH = 1
@@ -47,11 +48,20 @@ class Policy:
 if __name__ == '__main__':
     lp = get_lazy_policy()
     ap = get_aggressive_policy()
+
+    print(lp, ap)
     env = EnvQ()
     ipe = IterativePolicyEvaluation(env=env)
 
-    v = ipe.evaluate(policy=lp, gamma=DISCOUNT_FACTOR)
-    ipe.plot_value_function(v)
+    v_lazy = ipe.evaluate(policy=lp, gamma=DISCOUNT_FACTOR)
+    #ipe.plot_value_function(v_lazy)
+    print(v_lazy)
 
-    v = ipe.evaluate(policy=ap, gamma=DISCOUNT_FACTOR)
-    ipe.plot_value_function(v)
+    v_aggressive = ipe.evaluate(policy=ap, gamma=DISCOUNT_FACTOR)
+    #ipe.plot_value_function(v_aggressive)
+    print(v_aggressive)
+    plt.plot(v_lazy, label = "lazy")
+    plt.plot(v_aggressive, label = "aggressive")
+    plt.legend()
+    plt.show()
+
