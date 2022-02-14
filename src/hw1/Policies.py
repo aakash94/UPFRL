@@ -170,5 +170,8 @@ def problem2(lp_v, ap_v):
 
 
 if __name__ == '__main__':
+    random_seed = 42
+    np.random.seed(random_seed)
+    random.seed(random_seed)
     lp_v, ap_v = problem1()
     problem2(lp_v=lp_v, ap_v=ap_v)
