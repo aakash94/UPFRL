@@ -1,16 +1,18 @@
+import time
 import copy
-
-from EnvQ import EnvQ
-from IterativePolicyEvaluation import IterativePolicyEvaluation
 import random
 import numpy as np
 from matplotlib import pyplot as plt
+
+from EnvQ import EnvQ
+from IterativePolicyEvaluation import IterativePolicyEvaluation
 
 ACTION_LOW = 0
 ACTION_HIGH = 1
 NUM_ACTION = 2
 STATE_SIZE = 100
 DISCOUNT_FACTOR = 0.9
+CHECKPOINT_MARKS = [10, 20, 50, 100]
 
 
 def get_aggressive_policy(threshold=50):
@@ -49,33 +51,49 @@ def policy_improvement(env: EnvQ, V, gamma=DISCOUNT_FACTOR):
     policy = np.zeros([env.max_length, NUM_ACTION]) / NUM_ACTION
     for s in range(env.max_length):
         q = q_from_v(env, V, s, gamma=gamma)
+        # OPTION 1: construct a deterministic policy
+        # policy[s][np.argmax(q)] = 1
+
+        # OPTION 2: construct a stochastic policy that puts equal probability on maximizing actions
         best_a = np.argwhere(q == np.max(q)).flatten()
         policy[s] = np.sum([np.eye(NUM_ACTION)[i] for i in best_a], axis=0) / len(best_a)
+
     return policy
 
 
 def policy_iteration(env: EnvQ, ipe: IterativePolicyEvaluation, gamma=DISCOUNT_FACTOR, theta=1e-8):
+    start_time = time.process_time()
     policy = np.ones([env.max_length, NUM_ACTION]) / NUM_ACTION
+    value_function_dict = {}
+    iteration_count = 0
     # print(policy)
     while True:
         V = ipe.evaluate(policy=policy, gamma=gamma, theta=theta)
+        if iteration_count in CHECKPOINT_MARKS:
+            value_function_dict[iteration_count] = V
+
         new_policy = policy_improvement(env, V)
 
         # OPTION 1: stop if the policy is unchanged after an improvement step
-        if (new_policy == policy).all():
-            break;
-
-        # OPTION 2: stop if the value function estimates for successive policies has converged
-        # if np.max(abs(policy_evaluation(env, policy) - policy_evaluation(env, new_policy))) < theta*1e2:
+        # if (new_policy == policy).all():
         #    break;
 
+        # OPTION 2: stop if the value function estimates for successive policies has converged
+        if np.max(abs(ipe.evaluate(policy) - ipe.evaluate(new_policy))) < theta:
+            break
+
         policy = copy.copy(new_policy)
+        iteration_count += 1
     # print(policy)
-    return policy, V
+    time_taken_ns = (time.process_time() - start_time)
+    return policy, V, iteration_count, value_function_dict, time_taken_ns
 
 
 def value_iteration(env: EnvQ, gamma=DISCOUNT_FACTOR, theta=1e-8):
+    start_time = time.process_time()
     V = np.zeros(env.max_length)
+    value_function_dict = {}
+    iteration_count = 0
     while True:
         delta = 0
         for s in range(env.max_length):
@@ -84,8 +102,15 @@ def value_iteration(env: EnvQ, gamma=DISCOUNT_FACTOR, theta=1e-8):
             delta = max(delta, abs(V[s] - v))
         if delta < theta:
             break
+        # print(delta)
+        iteration_count += 1
+        if iteration_count in CHECKPOINT_MARKS:
+            value_function_dict[iteration_count] = copy.copy(V)
+
+    value_function_dict[iteration_count] = copy.copy(V)
     policy = policy_improvement(env, V, gamma)
-    return policy, V
+    time_taken_ns = (time.process_time() - start_time)
+    return policy, V, iteration_count, value_function_dict, time_taken_ns
 
 
 def plot_difference(v1, v2, tag=""):
@@ -123,13 +148,25 @@ def problem1():
 def problem2(lp_v, ap_v):
     env = EnvQ()
     ipe = IterativePolicyEvaluation(env=env)
-    pi_p, pi_v = policy_iteration(env=env, ipe=ipe)
-    vi_p, vi_v = value_iteration(env=env)
+    pi_p, pi_v, pi_steps, pi_checkpoints, pi_time = policy_iteration(env=env, ipe=ipe)
+    vi_p, vi_v, vi_steps, vi_checkpoints, vi_time = value_iteration(env=env)
+
+    print("Policy iteration took ", pi_steps, " iterations and ", pi_time, " s")
+    print("Value iteration took  ", vi_steps, " iterations and ", vi_time, " s")
+
+    # plot_difference(vi_checkpoints[1], vi_checkpoints[vi_steps], tag="VI 1 v end")
+    # plot_difference(pi_v, vi_checkpoints[vi_steps], tag="PI 1 v end")
+    # vi_start = vi_checkpoints[1]
+    for timestep in CHECKPOINT_MARKS:
+        pi_value = pi_checkpoints[timestep] if timestep in pi_checkpoints else pi_v
+        vi_value = vi_checkpoints[timestep] if timestep in vi_checkpoints else vi_v
+        tag = "Policy Iteration - Value Iteration at Step " + str(timestep)
+        plot_difference(pi_value, vi_value, tag=tag)
+        # print("timestep \t", timestep,"\t",sum(abs(vi_start - vi_value)))
 
     plot_difference(pi_v, vi_v, "Policy Iteration - Value Iteration")
     plot_difference(pi_v, lp_v, "Optimal - Lazy Policy")
     plot_difference(pi_v, ap_v, "Optimal - Aggressive Policy")
-
 
 
 if __name__ == '__main__':
