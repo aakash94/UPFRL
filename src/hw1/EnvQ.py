@@ -12,7 +12,7 @@ class EnvQ(gym.Env):
         self.timestep_limit = timestep_limit
         self.max_length = max_state
         self.min_length = min_state
-        self.state = random.randint(0, 99)
+        self.state = self.max_length - 1
 
         self.actions = [0, 1]
         self.action_low = 0
@@ -90,7 +90,7 @@ class EnvQ(gym.Env):
         return self.state, reward, done, {}
 
     def reset(self):
-        self.state = random.randint(0, 99)
+        self.state = self.max_length - 1
         self.timestep_count = 0
         return self.state
 
