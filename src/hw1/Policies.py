@@ -63,6 +63,7 @@ def policy_improvement(env: EnvQ, V, gamma=DISCOUNT_FACTOR):
 
 def policy_iteration(env: EnvQ, ipe: IterativePolicyEvaluation, gamma=DISCOUNT_FACTOR, theta=1e-8):
     start_time = time.process_time()
+    time_100 = np.inf
     policy = np.ones([env.max_length, NUM_ACTION]) / NUM_ACTION
     value_function_dict = {}
     iteration_count = 0
@@ -70,7 +71,7 @@ def policy_iteration(env: EnvQ, ipe: IterativePolicyEvaluation, gamma=DISCOUNT_F
     while True:
         V = ipe.evaluate(policy=policy, gamma=gamma, theta=theta)
         if iteration_count in CHECKPOINT_MARKS:
-            value_function_dict[iteration_count] = V
+            value_function_dict[iteration_count] = copy.copy(V)
 
         new_policy = policy_improvement(env, V)
 
@@ -84,13 +85,18 @@ def policy_iteration(env: EnvQ, ipe: IterativePolicyEvaluation, gamma=DISCOUNT_F
 
         policy = copy.copy(new_policy)
         iteration_count += 1
+        if iteration_count == 100:
+            time_100 = (time.process_time() - start_time)
+
     # print(policy)
-    time_taken_ns = (time.process_time() - start_time)
-    return policy, V, iteration_count, value_function_dict, time_taken_ns
+    time_taken_s = (time.process_time() - start_time)
+    time_100 = min(time_taken_s, time_100)
+    return policy, V, iteration_count, value_function_dict, time_taken_s, time_100
 
 
 def value_iteration(env: EnvQ, gamma=DISCOUNT_FACTOR, theta=1e-8):
     start_time = time.process_time()
+    time_100 = np.inf
     V = np.zeros(env.max_length)
     value_function_dict = {}
     iteration_count = 0
@@ -104,13 +110,17 @@ def value_iteration(env: EnvQ, gamma=DISCOUNT_FACTOR, theta=1e-8):
             break
         # print(delta)
         iteration_count += 1
+        if iteration_count == 100:
+            time_100 = (time.process_time() - start_time)
+
         if iteration_count in CHECKPOINT_MARKS:
             value_function_dict[iteration_count] = copy.copy(V)
 
     value_function_dict[iteration_count] = copy.copy(V)
     policy = policy_improvement(env, V, gamma)
-    time_taken_ns = (time.process_time() - start_time)
-    return policy, V, iteration_count, value_function_dict, time_taken_ns
+    time_taken_s = (time.process_time() - start_time)
+    time_100 = min(time_taken_s, time_100)
+    return policy, V, iteration_count, value_function_dict, time_taken_s, time_100
 
 
 def plot_difference(v1, v2, tag=""):
@@ -141,6 +151,9 @@ def problem1():
     # plt.show()
 
     plot_difference(v1=v_lazy, v2=v_aggressive, tag="Lazy - Aggressive")
+    print("Difference at timestep 49 is ",v_lazy[49]-v_aggressive[49])
+    print("Difference at timestep 50 is ",v_lazy[50]-v_aggressive[50])
+    print("Difference at timestep 80 is ",v_lazy[80]-v_aggressive[80])
 
     return v_lazy, v_aggressive
 
@@ -148,12 +161,17 @@ def problem1():
 def problem2(lp_v, ap_v):
     env = EnvQ()
     ipe = IterativePolicyEvaluation(env=env)
-    pi_p, pi_v, pi_steps, pi_checkpoints, pi_time = policy_iteration(env=env, ipe=ipe)
-    vi_p, vi_v, vi_steps, vi_checkpoints, vi_time = value_iteration(env=env)
+    pi_p, pi_v, pi_steps, pi_checkpoints, pi_time, pi_time_100 = policy_iteration(env=env, ipe=ipe)
+    vi_p, vi_v, vi_steps, vi_checkpoints, vi_time, vi_time_100 = value_iteration(env=env)
 
     print("Policy iteration took ", pi_steps, " iterations and ", pi_time, " s")
     print("Value iteration took  ", vi_steps, " iterations and ", vi_time, " s")
 
+    print("Policy Iteration time for 100 steps ", pi_time_100)
+    print("Value Iteration time for 100 steps ", vi_time_100)
+
+    ipe.plot_value_function(pi_v,tag="Policy Iteration Value Function")
+    ipe.plot_value_function(vi_v,tag="Value Iteration Value Function")
     # plot_difference(vi_checkpoints[1], vi_checkpoints[vi_steps], tag="VI 1 v end")
     # plot_difference(pi_v, vi_checkpoints[vi_steps], tag="PI 1 v end")
     # vi_start = vi_checkpoints[1]

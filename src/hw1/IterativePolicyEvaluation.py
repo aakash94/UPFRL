@@ -2,8 +2,8 @@ from EnvQ import EnvQ
 import numpy as np
 from matplotlib import pyplot as plt
 
-
 DISCOUNT_FACTOR = 0.9
+
 
 class IterativePolicyEvaluation:
 
@@ -25,6 +25,7 @@ class IterativePolicyEvaluation:
                 break
         return V
 
-    def plot_value_function(self, V):
+    def plot_value_function(self, V, tag=""):
         plt.bar(range(len(V)), V)
+        plt.title(tag)
         plt.show()
