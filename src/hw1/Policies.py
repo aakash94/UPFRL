@@ -151,9 +151,9 @@ def problem1():
     # plt.show()
 
     plot_difference(v1=v_lazy, v2=v_aggressive, tag="Lazy - Aggressive")
-    # print("Difference at timestep 49 is ",v_lazy[49]-v_aggressive[49])
-    # print("Difference at timestep 50 is ",v_lazy[50]-v_aggressive[50])
-    # print("Difference at timestep 80 is ",v_lazy[80]-v_aggressive[80])
+    print("Difference at timestep 49 is ",v_lazy[49]-v_aggressive[49])
+    print("Difference at timestep 50 is ",v_lazy[50]-v_aggressive[50])
+    print("Difference at timestep 80 is ",v_lazy[80]-v_aggressive[80])
 
     return v_lazy, v_aggressive
 
