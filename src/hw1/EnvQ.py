@@ -39,19 +39,29 @@ class EnvQ(gym.Env):
                 increment_p = arrival_rate * (1 - service_rate)
                 same_p = (service_rate * arrival_rate) + ((1 - service_rate) * (1 - arrival_rate))
 
-                if s + 1 >= 100:
-                    increment_tuple = (increment_p, s, reward, False)
+                if s >= 99:
+                    # state is out of bound, bring back to 99
+                    increment_tuple = (increment_p, 99, reward, False)
                 else:
-                    increment_tuple = (increment_p, s, reward, False)
+                    # state is less than 99, can increment by 1
+                    increment_tuple = (increment_p, s + 1, reward, False)
 
-                if s - 1 <= 0:
-                    decrement_tuple = (decrement_p, s - 1, reward, True)
+                if s <= 1:
+                    # after deduction state will either be 0 or less
+                    # bring back to 0 and terminate episode
+                    decrement_tuple = (decrement_p, 0, reward, True)
                 else:
+                    # after deduction state will be greater than 0
                     decrement_tuple = (decrement_p, s - 1, reward, False)
 
                 if s <= 0:
-                    same_tuple = (same_p, s, reward, True)
+                    # state is already 0 or lesser. Terminate.
+                    same_tuple = (same_p, 0, reward, True)
+                elif s >= 99:
+                    # state has crossed the limit. Bring back in bounds.
+                    same_tuple = (same_p, 99, reward, False)
                 else:
+                    # stay wherever the state is.
                     same_tuple = (same_p, s, reward, False)
 
                 p[s][a] = [decrement_tuple, same_tuple, increment_tuple]
