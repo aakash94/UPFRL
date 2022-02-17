@@ -134,6 +134,16 @@ def plot_difference(v1, v2, tag=""):
     plt.show()
 
 
+def plot_policy(policy, label="", tag=""):
+    #q_high = policy[ACTION_HIGH]
+    q_high = [row[ACTION_HIGH] for row in policy]
+    y_line = list(range(STATE_SIZE))
+    plt.scatter(y_line, q_high, alpha=0.9, label=label)
+    plt.legend()
+    plt.title(tag)
+    plt.show()
+
+
 def problem1():
     lp = get_lazy_policy()
     ap = get_aggressive_policy()
@@ -151,9 +161,19 @@ def problem1():
     # plt.show()
 
     plot_difference(v1=v_lazy, v2=v_aggressive, tag="Lazy - Aggressive")
-    print("Difference at timestep 49 is ",v_lazy[49]-v_aggressive[49])
-    print("Difference at timestep 50 is ",v_lazy[50]-v_aggressive[50])
-    print("Difference at timestep 80 is ",v_lazy[80]-v_aggressive[80])
+    print("Difference at timestep 49 is ", v_lazy[49] - v_aggressive[49])
+    print("Difference at timestep 50 is ", v_lazy[50] - v_aggressive[50])
+    print("Difference at timestep 80 is ", v_lazy[80] - v_aggressive[80])
+
+    y_line = list(range(env.max_length))
+    plt.scatter(y_line, v_lazy, alpha=0.5, label="Lazy Policy Value Function")
+    plt.scatter(y_line, v_aggressive, alpha=0.5, label="Aggressive Policy Value Function")
+    plt.title('Lazy and Aggressive Policies')
+    plt.legend()
+    plt.show()
+
+    plot_policy(policy=lp, label="Action (0 = Low, 1 = High)", tag="Lazy Policy")
+    plot_policy(policy=ap, label="Action (0 = Low, 1 = High)", tag="Aggressive Policy")
 
     return v_lazy, v_aggressive
 
@@ -170,21 +190,28 @@ def problem2(lp_v, ap_v):
     print("Policy Iteration time for 100 steps ", pi_time_100)
     print("Value Iteration time for 100 steps ", vi_time_100)
 
-    ipe.plot_value_function(pi_v,tag="Policy Iteration Value Function")
-    ipe.plot_value_function(vi_v,tag="Value Iteration Value Function")
-    # plot_difference(vi_checkpoints[1], vi_checkpoints[vi_steps], tag="VI 1 v end")
-    # plot_difference(pi_v, vi_checkpoints[vi_steps], tag="PI 1 v end")
-    # vi_start = vi_checkpoints[1]
+    ipe.plot_value_function(pi_v, tag="Policy Iteration Value Function")
+    ipe.plot_value_function(vi_v, tag="Value Iteration Value Function")
+
+    y_line = list(range(env.max_length))
+    pi_line = pi_v
+    v_line = vi_v
+    plt.scatter(y_line, pi_line, alpha=0.8, label="Policy Iteration: Final")
+    plt.scatter(y_line, v_line, alpha=0.8, label="Value Iteration: Final")
+
     for timestep in CHECKPOINT_MARKS:
-        pi_value = pi_checkpoints[timestep] if timestep in pi_checkpoints else pi_v
         vi_value = vi_checkpoints[timestep] if timestep in vi_checkpoints else vi_v
-        tag = "Policy Iteration - Value Iteration at Step " + str(timestep)
-        plot_difference(pi_value, vi_value, tag=tag)
-        # print("timestep \t", timestep,"\t",sum(abs(vi_start - vi_value)))
+        tag = "Value Iteration: " + str(timestep)
+        plt.scatter(y_line, vi_value, alpha=0.8, label=tag)
+
+    plt.title('PI & VI Value Functions over different timesteps')
+    plt.legend()
+    plt.show()
 
     plot_difference(pi_v, vi_v, "Policy Iteration - Value Iteration")
     plot_difference(pi_v, lp_v, "Optimal - Lazy Policy")
     plot_difference(pi_v, ap_v, "Optimal - Aggressive Policy")
+    plot_policy(policy=pi_p, label="Action (0 = Low, 1 = High)", tag="Optimal Policy")
 
 
 if __name__ == '__main__':
