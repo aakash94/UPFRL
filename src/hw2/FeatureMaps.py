@@ -10,9 +10,14 @@ class FeatureMaps():
 
     def __init__(self):
         print("Feature Maps")
+        env = EnvQ()
+        self.len_q = env.max_length
 
     def get_fine_fm(self):
-        return []
+        shape = (self.len_q+1, self.len_q+1)
+        fm = np.zeros(shape)
+        np.fill_diagonal(fm, 1)
+        return fm
 
     def get_coarse_fm(self):
         return []
@@ -26,6 +31,6 @@ if __name__ == '__main__':
     ffm = fm.get_fine_fm()
     cfm = fm.get_coarse_fm()
     pwlfm = fm.get_pwl_fm()
-    print("Fine\t", ffm)
-    print("Coarse\t", cfm)
-    print("piecewise linear\t", pwlfm)
+    print("\nFine\n", ffm)
+    print("\nCoarse\n", cfm)
+    print("\npiecewise linear\n", pwlfm)
