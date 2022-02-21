@@ -14,13 +14,24 @@ class FeatureMaps():
         self.len_q = env.max_length
 
     def get_fine_fm(self):
-        shape = (self.len_q+1, self.len_q+1)
+        side = self.len_q+1
+        shape = (side, side)
         fm = np.zeros(shape)
         np.fill_diagonal(fm, 1)
         return fm
 
     def get_coarse_fm(self):
-        return []
+        side = int(self.len_q/5)
+        shape = (self.len_q, side)
+        fm = np.zeros(shape)
+
+        for x in range(self.len_q+1):
+            for s in range(side):
+                lower_bound = 5*(s-1)
+                upper_bound = (5*s)-1
+                if x>= lower_bound and x <= upper_bound:
+                    fm[x][s] = 1
+        return fm
 
     def get_pwl_fm(self):
         return []
