@@ -2,9 +2,15 @@ import time
 import copy
 import random
 import numpy as np
+from matplotlib import pyplot as plt
 
 from EnvQ import EnvQ
 
+
+def test_plot(a, tag = ""):
+    plt.bar(range(len(a)), a)
+    plt.title(tag)
+    plt.show()
 
 class FeatureMaps():
 
@@ -33,7 +39,13 @@ class FeatureMaps():
         return fm
 
     def get_pwl_fm(self):
-        return []
+        half_side = int(self.len_q / 5)
+        side =  half_side*2
+        shape = (self.len_q, side)
+        cfm = self.get_coarse_fm()
+        fm = np.zeros(shape)
+        fm[0:100, 0:half_side] = cfm
+        return fm
 
 
 if __name__ == '__main__':
@@ -45,3 +57,6 @@ if __name__ == '__main__':
     print("\nCoarse\n", cfm)
     print("\npiecewise linear\n", pwlfm)
     print("\nDone\n")
+    test_plot(ffm.argmax(axis=1), "FFM")
+    test_plot(cfm.argmax(axis=1), "CFM")
+    test_plot(pwlfm.argmax(axis=1), "PWLFM")
