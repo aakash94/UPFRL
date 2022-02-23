@@ -12,33 +12,37 @@ from IterativePolicyEvaluation import IterativePolicyEvaluation
 
 SEED = 4
 
-np.random.seed(SEED) 
+np.random.seed(SEED)
 
-def alpha_function(timestep = 0, a = 10^5, b = 10^5):
-    return a/(timestep +b)
-    
+
+def alpha_function(timestep=0, a=10 ^ 5, b=10 ^ 5):
+    return a / (timestep + b)
+
+
 class TD():
+
     def __init__(self, env: EnvQ):
         self.env = env
 
-    def evaluate (self, policy, num_episodes, alpha_function = alpha_function , gamma = .9):
+    def evaluate(self, policy, alpha_function=alpha_function, gamma=.9):
         V = defaultdict(float)
-        
-        state=self.env.reset()
+
+        state = self.env.reset()
         policy_fun = policy()
-        
-        for i_episode in range(num_episodes):
+        done = False
+        timestep = 0
+        while not done:
             action = np.random.choice(self.env.actions, 1, p=policy_fun[state])
             next_state, reward, done, _ = self.env.step(action[0])
-            alpha = alpha_function(i_episode)
-            V[state] += alpha * (reward + gamma * V[next_state] - V[state])
+            alpha = alpha_function(timestep=timestep)
+            V[state] += alpha * (reward + (gamma * V[next_state]) - V[state])
             state = next_state
-
+            timestep += 1
         return V
 
 
 if __name__ == '__main__':
-    env = EnvQ(seed=SEED)
+    env = EnvQ(timestep_limit=10e+4, seed=SEED)
     td = TD(env)
-    V = td.evaluate(get_aggressive_policy, 10^7, alpha_function)
+    V = td.evaluate(policy=get_aggressive_policy, alpha_function=alpha_function)
     print(V)
