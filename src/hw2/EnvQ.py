@@ -49,14 +49,14 @@ class EnvQ(gym.Env):
                 if s <= 1:
                     # after deduction state will either be 0 or less
                     # bring back to 0 and terminate episode
-                    decrement_tuple = (decrement_p, 0, reward, True)
+                    decrement_tuple = (decrement_p, 0, reward, False)
                 else:
                     # after deduction state will be greater than 0
                     decrement_tuple = (decrement_p, s - 1, reward, False)
 
                 if s <= 0:
                     # state is already 0 or lesser. Terminate.
-                    same_tuple = (same_p, 0, reward, True)
+                    same_tuple = (same_p, 0, reward, False)
                 elif s >= 99:
                     # state has crossed the limit. Bring back in bounds.
                     same_tuple = (same_p, 99, reward, False)
