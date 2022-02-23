@@ -31,6 +31,12 @@ def get_lazy_policy():
     return policy
 
 
+def get_super_aggressive_policy():
+    policy = np.ones((STATE_SIZE, NUM_ACTION))
+    policy[:, 0] = 1 - policy[:, 1]
+    return policy
+
+
 def get_action(policy, state):
     action_probability = policy[state]
     actions = [0, 1]
@@ -135,7 +141,7 @@ def plot_difference(v1, v2, tag=""):
 
 
 def plot_policy(policy, label="", tag=""):
-    #q_high = policy[ACTION_HIGH]
+    # q_high = policy[ACTION_HIGH]
     q_high = [row[ACTION_HIGH] for row in policy]
     y_line = list(range(STATE_SIZE))
     plt.scatter(y_line, q_high, alpha=0.9, label=label)
