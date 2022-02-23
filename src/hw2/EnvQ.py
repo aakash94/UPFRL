@@ -1,11 +1,20 @@
+from collections import defaultdict
+
 import gym
 import random
+import numpy as np
+
+ACTION_LOW = 0
+ACTION_HIGH = 1
+NUM_ACTION = 2
+STATE_SIZE = 100
+DISCOUNT_FACTOR = 0.9
 
 
 class EnvQ(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, max_state=100, min_state=0, action_size=2, timestep_limit=10^10, seed=None):
+    def __init__(self, max_state=100, min_state=0, action_size=2, timestep_limit=10 ^ 10, seed=None):
         if seed is not None:
             random.seed(seed)
 
@@ -110,14 +119,22 @@ class EnvQ(gym.Env):
     def close(self):
         pass
 
+    def test_policy_coverage(self, policy):
+        count = defaultdict(int)
+        done = False
+        state = self.reset()
+        count[state] += 1
+        while not done:
+            action = np.random.choice(self.actions, 1, p=policy[state])
+            state, reward, done, _ = self.step(action=action[0])
+            count[state] += 1
+        return count
+
 
 if __name__ == '__main__':
-    env = EnvQ()
-    env.render()
-    env.step(env.action_low)
-    env.render()
-    env.step(env.action_high)
-    env.render()
+    from Policies import get_super_aggressive_policy, get_aggressive_policy, get_lazy_policy
 
-    # print()
-    # print(env.transition)
+    policy = get_lazy_policy()
+    env = EnvQ(timestep_limit=10000)
+    count = env.test_policy_coverage(policy=policy)
+    print(count)
