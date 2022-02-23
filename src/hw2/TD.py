@@ -6,6 +6,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from collections import defaultdict
 
+from tqdm import tqdm
+
 from EnvQ import EnvQ
 from Policies import get_lazy_policy, get_aggressive_policy, policy_improvement, DISCOUNT_FACTOR, plot_policy
 from IterativePolicyEvaluation import IterativePolicyEvaluation
@@ -32,6 +34,7 @@ class TD():
         policy_fun = policy()
         done = False
         timestep = 0
+        pbar = tqdm(desc = "Timesteps Elapsed", total= timestep+1)
         while not done:
             action = np.random.choice(self.env.actions, 1, p=policy_fun[state])
             next_state, reward, done, _ = self.env.step(action[0])
@@ -39,11 +42,13 @@ class TD():
             V[state] += alpha * (reward + (gamma * V[next_state]) - V[state])
             state = next_state
             timestep += 1
+            pbar.update(1)
+        pbar.close()
         return V
 
 
 if __name__ == '__main__':
-    env = EnvQ(timestep_limit=10e+6, seed=SEED)
+    env = EnvQ(timestep_limit=10e+5, seed=SEED)
     td = TD(env)
     V = td.evaluate(policy=get_aggressive_policy, alpha_function=alpha_function)
     print(V)
