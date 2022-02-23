@@ -17,17 +17,15 @@ class TD():
     def __init__(self, env: EnvQ):
         self.env = env
 
-    def evaluate (self, policy, env, num_episodes, alpha_function = alpha_function , gamma = .9):
+    def evaluate (self, policy, num_episodes, alpha_function = alpha_function , gamma = .9):
         V = defaultdict(float)
-        number_of_actions = len(self.env.actions)
-        t = 0
+        
         for i_episode in range(1, num_episodes+1):
             state=self.env.reset()
             while True:
-                delta = 0
                 action = np.choice(self.env.actions, 1, p=policy[state])
                 next_state, reward, done, _ = self.env.step(action)
-                alpha = alpha_function(t)
+                alpha = alpha_function(i_episode)
                 V[state] += alpha * (reward + gamma * V[next_state] - V[state])
                 if done:
                     break
