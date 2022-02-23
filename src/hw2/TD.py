@@ -7,8 +7,9 @@ from matplotlib import pyplot as plt
 from collections import defaultdict
 
 from EnvQ import EnvQ
-from Policies import get_lazy_policy, get_aggressive_policy
+from Policies import get_lazy_policy, get_aggressive_policy, policy_improvement, DISCOUNT_FACTOR, plot_policy
 from IterativePolicyEvaluation import IterativePolicyEvaluation
+from FeatureMaps import test_plot
 
 SEED = 4
 
@@ -24,7 +25,7 @@ class TD():
     def __init__(self, env: EnvQ):
         self.env = env
 
-    def evaluate(self, policy, alpha_function=alpha_function, gamma=.9):
+    def evaluate(self, policy, alpha_function=alpha_function, gamma=DISCOUNT_FACTOR):
         V = defaultdict(float)
 
         state = self.env.reset()
@@ -42,7 +43,9 @@ class TD():
 
 
 if __name__ == '__main__':
-    env = EnvQ(timestep_limit=10e+4, seed=SEED)
+    env = EnvQ(timestep_limit=10e+6, seed=SEED)
     td = TD(env)
     V = td.evaluate(policy=get_aggressive_policy, alpha_function=alpha_function)
     print(V)
+    value_v = V.values()
+    test_plot(a= value_v, tag="Approximate Value Function")
