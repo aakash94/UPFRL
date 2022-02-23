@@ -5,7 +5,7 @@ import random
 class EnvQ(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, max_state=100, min_state=0, action_size=2, timestep_limit=1073741824, seed=None):
+    def __init__(self, max_state=100, min_state=0, action_size=2, timestep_limit=10^10, seed=None):
         if seed is not None:
             random.seed(seed)
 
