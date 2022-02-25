@@ -32,7 +32,8 @@ class TD():
         self.gamma = gamma
 
     def get_alpha(self, timestep, a=10e5, b=10e5):
-        alpha = a / (timestep + b)
+        # alpha = a / (timestep + b)
+        alpha = 0.01
         return alpha
 
     def evaluate(self, policy, actual_value):
