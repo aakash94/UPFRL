@@ -29,28 +29,46 @@ class TD():
 
     def evaluate(self, policy, alpha_function=alpha_function, gamma=DISCOUNT_FACTOR):
         V = defaultdict(float)
-
+        coverage = defaultdict(int)
+        one_tenth = int(env.timestep_limit/10)
         state = self.env.reset()
         policy_fun = policy()
         done = False
         timestep = 0
-        pbar = tqdm(desc = "Timesteps Elapsed", total= timestep+1)
+        pbar = tqdm(desc="Timesteps Elapsed", total=timestep + 1)
         while not done:
+            coverage[state]+=1
             action = np.random.choice(self.env.actions, 1, p=policy_fun[state])
             next_state, reward, done, _ = self.env.step(action[0])
-            alpha = alpha_function(timestep=timestep)
-            V[state] += alpha * (reward + (gamma * V[next_state]) - V[state])
+            #alpha = alpha_function(timestep=timestep)
+            alpha = 0.001
+            delta = (reward + (gamma * V[next_state])) - V[state]
+            V[state] += alpha * delta
             state = next_state
+            if timestep%one_tenth == 0:
+                print("Delta\t", delta)
             timestep += 1
             pbar.update(1)
         pbar.close()
-        return V
+        return V, coverage
 
 
 if __name__ == '__main__':
-    env = EnvQ(timestep_limit=10e+5, seed=SEED)
+    env = EnvQ(timestep_limit=10e5, seed=SEED)
+    '''x    
     td = TD(env)
-    V = td.evaluate(policy=get_aggressive_policy, alpha_function=alpha_function)
+    V, coverage = td.evaluate(policy=get_lazy_policy, alpha_function=alpha_function)
     print(V)
     value_v = V.values()
-    test_plot(a= value_v, tag="Approximate Value Function")
+    coverage_v = coverage.values()
+    test_plot(a=coverage_v, tag="Occupancy")
+    test_plot(a=value_v, tag="Approximate Value Function")
+    '''
+
+    cost = 0.01
+    cost = 0.0
+    reward = defaultdict(float)
+    for s in range(100):
+        reward[s] = 0 - (((s / 100) ** 2) + (cost))
+    reward_v = reward.values()
+    test_plot(a=reward_v, tag="Rewards Function")
