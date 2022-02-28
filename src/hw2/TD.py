@@ -1,17 +1,12 @@
-import time
-import copy
-import random
 import numpy as np
 
-from matplotlib import pyplot as plt
 from collections import defaultdict
-
 from tqdm import tqdm
 
 from EnvQ import EnvQ
 from Policies import get_lazy_policy, get_aggressive_policy, policy_improvement, DISCOUNT_FACTOR, plot_policy
 from IterativePolicyEvaluation import IterativePolicyEvaluation
-from FeatureMaps import test_plot
+from Utils import plot_dict
 
 SEED = 4
 
@@ -34,7 +29,7 @@ class TD():
         policy_fun = policy()
         done = False
         timestep = 0
-        pbar = tqdm(desc = "Timesteps Elapsed", total= timestep+1)
+        pbar = tqdm(desc="Timesteps Elapsed", total=timestep + 1)
         while not done:
             action = np.random.choice(self.env.actions, 1, p=policy_fun[state])
             next_state, reward, done, _ = self.env.step(action[0])
@@ -52,5 +47,4 @@ if __name__ == '__main__':
     td = TD(env)
     V = td.evaluate(policy=get_aggressive_policy, alpha_function=alpha_function)
     print(V)
-    value_v = V.values()
-    test_plot(a= value_v, tag="Approximate Value Function")
+    plot_dict(a=V, tag="Approximate Value Function")

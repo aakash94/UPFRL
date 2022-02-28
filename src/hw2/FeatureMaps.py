@@ -1,16 +1,7 @@
-import time
-import copy
-import random
 import numpy as np
-from matplotlib import pyplot as plt
 
 from EnvQ import EnvQ
-
-
-def test_plot(a, tag=""):
-    plt.bar(range(len(a)), a)
-    plt.title(tag)
-    plt.show()
+from Utils import plot_list
 
 
 class FeatureMaps():
@@ -60,8 +51,8 @@ if __name__ == '__main__':
     cfm = fm.get_coarse_fm()
     pwlfm = fm.get_pwl_fm()
 
-    test_plot(ffm.argmax(axis=1), "FFM")
-    test_plot(cfm.argmax(axis=1), "CFM")
-    test_plot(pwlfm.argmax(axis=1), "PWLFM First Half")
-    test_plot(pwlfm.argmax(axis=1), "PWLFM Second Half")
+    plot_list(ffm.argmax(axis=1), "FFM")
+    plot_list(cfm.argmax(axis=1), "CFM")
+    plot_list(pwlfm.argmax(axis=1), "PWLFM First Half")
+    plot_list(pwlfm.argmax(axis=1), "PWLFM Second Half")
     print("\nDone\n")
