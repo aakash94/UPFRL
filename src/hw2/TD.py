@@ -63,6 +63,6 @@ if __name__ == '__main__':
     fine_map = fm.get_fine_fm()
     coarse_map = fm.get_coarse_fm()
     pwl_map = fm.get_pwl_fm()
-    V = td.evaluate(policy=get_aggressive_policy, feature_map=fine_map, alpha_function=alpha_function)
+    V = td.evaluate(policy=get_lazy_policy, feature_map=fine_map, alpha_function=alpha_function)
     print(V)
     plot_dict(a=V, tag="Approximate Value Function")
