@@ -31,13 +31,13 @@ class LSTD():
         A_B = np.zeros((fm_size, fm_size))
         bias = 1e-9
 
-        policy_fun = policy()
+
         done = False
         timestep = 0
         pbar = tqdm(total=(self.env.timestep_limit + 1))
 
         while not done:
-            action = np.random.choice(self.env.actions, p=policy_fun[state])
+            action = np.random.choice(self.env.actions, p=policy[state])
             next_state, reward, done, _ = self.env.step(action=action)
 
             A_B += feature_map[state].reshape(fm_size, 1) * (feature_map[state] - gamma * feature_map[next_state])
@@ -61,5 +61,6 @@ if __name__ == '__main__':
     fine_map = fm.get_fine_fm()
     coarse_map = fm.get_coarse_fm()
     pwl_map = fm.get_pwl_fm()
-    V = lstd.evaluate(policy=get_lazy_policy, feature_map=coarse_map)
+    policy = get_lazy_policy()
+    V = lstd.evaluate(policy=policy, feature_map=coarse_map)
     plot_dict(a=V, tag="Approximate Value Function")
