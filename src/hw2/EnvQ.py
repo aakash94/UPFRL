@@ -23,6 +23,8 @@ class EnvQ(gym.Env):
         self.min_length = min_state
         self.state = self.max_length - 1
 
+        self.arrival_rate = 0.5
+
         self.actions = [0, 1]
         self.action_low = 0
         self.action_high = 1
@@ -41,12 +43,11 @@ class EnvQ(gym.Env):
             for a in self.actions:
                 reward = 0 - (((s / self.max_length) ** 2) + (self.cost_action[a]))
 
-                arrival_rate = 0.5
                 service_rate = self.q_action[a]
 
-                decrement_p = service_rate * (1 - arrival_rate)
-                increment_p = arrival_rate * (1 - service_rate)
-                same_p = (service_rate * arrival_rate) + ((1 - service_rate) * (1 - arrival_rate))
+                decrement_p = service_rate * (1 - self.arrival_rate)
+                increment_p = self.arrival_rate * (1 - service_rate)
+                same_p = (service_rate * self.arrival_rate) + ((1 - service_rate) * (1 - self.arrival_rate))
 
                 if s >= 99:
                     # state is out of bound, bring back to 99
