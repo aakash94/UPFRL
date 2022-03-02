@@ -16,8 +16,9 @@ np.random.seed(SEED)
 
 class LSTD():
 
-    def __init__(self, env: EnvQ):
+    def __init__(self, env: EnvQ,  gamma=DISCOUNT_FACTOR):
         self.env = env
+        self.gamma = gamma
 
     def get_v(self, theta: np.ndarray, feature_map: np.ndarray):
         V = defaultdict(float)
@@ -25,13 +26,13 @@ class LSTD():
             V[state] = float(np.matmul(theta.T, feature_map[state]))
         return V
 
-    def evaluate(self, policy, feature_map, gamma=DISCOUNT_FACTOR):
+    def evaluate(self, policy, feature_map):
         state = self.env.reset()
         fm_size = feature_map.shape[1]
         theta = np.zeros_like(feature_map[state])
         B_T = np.zeros(fm_size)
         A_B = np.zeros((fm_size, fm_size))
-        some_small_value = 1e-5
+        bias = 1e-9
 
         policy_fun = policy()
         done = False
@@ -39,18 +40,18 @@ class LSTD():
         pbar = tqdm(desc="Timesteps Elapsed", total=timestep + 1)
 
         while not done:
-            action = np.random.choice(self.env.actions, 1, p=policy_fun[state])
-            next_state, reward, done, _ = self.env.step(action[0])
+            action = np.random.choice(self.env.actions, p=policy_fun[state])
+            next_state, reward, done, _ = self.env.step(action=action)
 
-            A_B += feature_map[state].reshape(fm_size, 1) * (feature_map[state] - gamma * feature_map[next_state])
-            B_T = feature_map[state] * reward
+            A_B += feature_map[state].reshape(fm_size, 1) * (feature_map[state] -self.gamma * feature_map[next_state])
+            B_T += feature_map[state] * reward
             state = next_state
             timestep += 1
             pbar.update(1)
 
         pbar.close()
         if np.linalg.det(A_B) == 0:
-            A_B += some_small_value * np.eye(fm_size)
+            A_B += bias * np.eye(fm_size)
 
         theta = np.linalg.solve(A_B, B_T)
         return self.get_v(theta=theta, feature_map=feature_map)
