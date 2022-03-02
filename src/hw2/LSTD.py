@@ -5,7 +5,6 @@ from tqdm import tqdm
 
 from EnvQ import EnvQ
 from Policies import get_lazy_policy, get_aggressive_policy, policy_improvement, DISCOUNT_FACTOR, plot_policy
-from IterativePolicyEvaluation import IterativePolicyEvaluation
 from Utils import plot_dict
 from FeatureMaps import FeatureMaps
 
@@ -16,9 +15,8 @@ np.random.seed(SEED)
 
 class LSTD():
 
-    def __init__(self, env: EnvQ,  gamma=DISCOUNT_FACTOR):
+    def __init__(self, env: EnvQ):
         self.env = env
-        self.gamma = gamma
 
     def get_v(self, theta: np.ndarray, feature_map: np.ndarray):
         V = defaultdict(float)
@@ -26,10 +24,9 @@ class LSTD():
             V[state] = float(np.matmul(theta.T, feature_map[state]))
         return V
 
-    def evaluate(self, policy, feature_map):
+    def evaluate(self, policy, feature_map, gamma=DISCOUNT_FACTOR):
         state = self.env.reset()
         fm_size = feature_map.shape[1]
-        theta = np.zeros_like(feature_map[state])
         B_T = np.zeros(fm_size)
         A_B = np.zeros((fm_size, fm_size))
         bias = 1e-9
@@ -43,7 +40,7 @@ class LSTD():
             action = np.random.choice(self.env.actions, p=policy_fun[state])
             next_state, reward, done, _ = self.env.step(action=action)
 
-            A_B += feature_map[state].reshape(fm_size, 1) * (feature_map[state] -self.gamma * feature_map[next_state])
+            A_B += feature_map[state].reshape(fm_size, 1) * (feature_map[state] - gamma * feature_map[next_state])
             B_T += feature_map[state] * reward
             state = next_state
             timestep += 1

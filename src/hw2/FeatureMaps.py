@@ -7,7 +7,6 @@ from Utils import plot_list
 class FeatureMaps():
 
     def __init__(self):
-        print("Feature Maps")
         env = EnvQ()
         self.len_q = env.max_length
 
