@@ -21,9 +21,8 @@ def alpha_function(timestep=0, a=10 ^ 5, b=10 ^ 5):
 
 class TD():
 
-    def __init__(self, env: EnvQ,  gamma=DISCOUNT_FACTOR):
+    def __init__(self, env: EnvQ):
         self.env = env
-        self.gamma = gamma
 
     def get_alpha(self, timestep, a=10e5, b=10e5):
         alpha = a / (timestep + b)
@@ -35,33 +34,33 @@ class TD():
             V[state] = float(np.matmul(theta.T, feature_map[state]))
         return V
 
-    def evaluate(self, policy, actual_value):
+    def evaluate(self, policy, feature_map, gamma=DISCOUNT_FACTOR):
         v = defaultdict(float)
         state = self.env.reset()
+        theta = np.zeros_like(feature_map[state])
         done = False
         timestep = 0
         pbar = tqdm(total=(self.env.timestep_limit + 1))
         while not done:
             action = np.random.choice(a=self.env.actions, p=policy[state])
-            # action = action[0]
             next_state, reward, done, _ = self.env.step(action=action)
+
+            v_state = np.matmul(theta.T, feature_map[state])
+            v_next_state = np.matmul(theta.T, feature_map[next_state])
+
             alpha = self.get_alpha(timestep=timestep)
-            delta = (reward + self.gamma * v[next_state]) - v[state]
-            v[state] += (alpha * delta)
+            delta = (reward + (gamma * v_next_state) - v_state)
+            theta += alpha * delta * feature_map[state]
+
             state = next_state
-            if timestep % 10000 == 0 and len(v) == len(actual_value):
-                # update MSE every 1000 steps
-                value = list(v.values())
-                diff = mean_squared_error(value, actual_value)
-                pbar.set_description("MSE Diff is %f" % diff)
             timestep += 1
             pbar.update(1)
         pbar.close()
-        return v
+        return self.get_v(theta=theta, feature_map=feature_map)
 
 
 if __name__ == '__main__':
-    env = EnvQ(timestep_limit=10e+4, seed=SEED)
+    env = EnvQ(timestep_limit=10e+5, seed=SEED)
     td = TD(env)
     fm = FeatureMaps()
     fine_map = fm.get_fine_fm()
@@ -69,10 +68,8 @@ if __name__ == '__main__':
     pwl_map = fm.get_pwl_fm()
 
     policy = get_lazy_policy()
-    ipe = IterativePolicyEvaluation(env=td.env)
-    v_lazy = ipe.evaluate(policy=policy, gamma=DISCOUNT_FACTOR)
-    V = td.evaluate(policy=policy, actual_value=v_lazy)
-    plot_dict(V,"TD0")
+    V = td.evaluate(policy=policy, feature_map=coarse_map)
+    plot_dict(V, "Approximate Value Function")
 
     '''
     V = td.evaluate(policy=get_lazy_policy, feature_map=fine_map, alpha_function=alpha_function)
