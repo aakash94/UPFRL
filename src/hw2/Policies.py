@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 
 from EnvQ import EnvQ
 from IterativePolicyEvaluation import IterativePolicyEvaluation
+from Utils import plot_dict, plot_list
 
 ACTION_LOW = 0
 ACTION_HIGH = 1
@@ -224,5 +225,13 @@ if __name__ == '__main__':
     random_seed = 42
     np.random.seed(random_seed)
     random.seed(random_seed)
-    lp_v, ap_v = problem1()
-    problem2(lp_v=lp_v, ap_v=ap_v)
+    lp = get_lazy_policy()
+    ap = get_aggressive_policy()
+
+    env = EnvQ()
+    ipe = IterativePolicyEvaluation(env=env)
+
+    v_lazy = ipe.evaluate(policy=lp, gamma=DISCOUNT_FACTOR)
+    v_aggressive = ipe.evaluate(policy=ap, gamma=DISCOUNT_FACTOR)
+    plot_list(v_lazy, "lazy")
+    plot_list(v_aggressive, "aggressive")

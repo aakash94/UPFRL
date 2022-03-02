@@ -93,14 +93,16 @@ class EnvQ(gym.Env):
             reward = d_reward
             new_state = d_next_state
             done = d_done
-        elif random_val >= d_prob and random_val < d_prob + s_prob:
+        elif random_val >= d_prob and random_val < (d_prob + s_prob):
             reward = s_reward
             new_state = s_next_state
             done = s_done
-        else:
+        elif random_val > (d_prob + s_prob) and random_val < (d_prob + s_prob + i_prob):
             reward = i_reward
             new_state = i_next_state
             done = i_done
+        else:
+            print("\n\n\nWTF\n\n")
 
         if self.timestep_count == self.timestep_limit:
             done = True
@@ -124,17 +126,32 @@ class EnvQ(gym.Env):
         done = False
         state = self.reset()
         count[state] += 1
+        c_d = 0
+        c_s = 0
+        c_i = 0
+
         while not done:
             action = np.random.choice(self.actions, 1, p=policy[state])
-            state, reward, done, _ = self.step(action=action[0])
+            next_state, reward, done, _ = self.step(action=action[0])
+            if next_state == state:
+                c_s += 1
+            elif next_state > state:
+                c_i += 1
+            else:
+                c_d += 1
+            state = next_state
             count[state] += 1
+        print("d\ts\ti")
+        print(c_d, "\t", c_s, "\t", c_i)
         return count
 
 
 if __name__ == '__main__':
     from Policies import get_super_aggressive_policy, get_aggressive_policy, get_lazy_policy
+    from Utils import plot_dict, plot_list
 
     policy = get_lazy_policy()
-    env = EnvQ(timestep_limit=10000)
+    env = EnvQ(timestep_limit=100000)
     count = env.test_policy_coverage(policy=policy)
-    print(count)
+    plot_dict(count, "Coverage")
+    # print(count)
