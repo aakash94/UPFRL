@@ -65,5 +65,4 @@ if __name__ == '__main__':
     coarse_map = fm.get_coarse_fm()
     pwl_map = fm.get_pwl_fm()
     V = lstd.evaluate(policy=get_lazy_policy, feature_map=coarse_map)
-    print(V)
     plot_dict(a=V, tag="Approximate Value Function")
