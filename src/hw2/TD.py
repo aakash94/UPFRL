@@ -5,10 +5,8 @@ from tqdm import tqdm
 
 from EnvQ import EnvQ
 from Policies import get_lazy_policy, get_aggressive_policy, policy_improvement, DISCOUNT_FACTOR, plot_policy
-from IterativePolicyEvaluation import IterativePolicyEvaluation
 from Utils import plot_dict
 from FeatureMaps import FeatureMaps
-from sklearn.metrics import mean_squared_error
 
 SEED = 4
 
@@ -70,9 +68,3 @@ if __name__ == '__main__':
     policy = get_lazy_policy()
     V = td.evaluate(policy=policy, feature_map=coarse_map)
     plot_dict(V, "Approximate Value Function")
-
-    '''
-    V = td.evaluate(policy=get_lazy_policy, feature_map=fine_map, alpha_function=alpha_function)
-    print(V)
-    plot_dict(a=V, tag="Approximate Value Function")
-    '''
