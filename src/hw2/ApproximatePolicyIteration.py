@@ -4,6 +4,7 @@ from Utils import plot_policy, plot_dict, plot_list, plot_q
 from FeatureMaps import FeatureMaps
 from Policies import \
     get_lazy_policy, \
+    value_iteration,\
     get_aggressive_policy, \
     policy_improvement, \
     DISCOUNT_FACTOR, \
@@ -68,6 +69,7 @@ if __name__ == '__main__':
     pi = ApproximatePolicyIteration(env=env, k=100)
     op = get_lazy_policy()
     # op = get_aggressive_policy()
+    op, _v, _steps, _checkpoints, _time, _time_100  = value_iteration(env=env)
     ipe = IterativePolicyEvaluation(env=env)
     v_ = ipe.evaluate(policy=op, gamma=DISCOUNT_FACTOR)
     # plot_policy(policy=op, label="Original Policy")
