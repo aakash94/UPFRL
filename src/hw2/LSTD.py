@@ -34,7 +34,7 @@ class LSTD():
 
         done = False
         timestep = 0
-        pbar = tqdm(total=(self.env.timestep_limit + 1))
+        # pbar = tqdm(total=(self.env.timestep_limit + 1))
 
         while not done:
             action = np.random.choice(self.env.actions, p=policy[state])
@@ -44,9 +44,9 @@ class LSTD():
             B_T += feature_map[state] * reward
             state = next_state
             timestep += 1
-            pbar.update(1)
+            #pbar.update(1)
 
-        pbar.close()
+        #pbar.close()
         if np.linalg.det(A_B) == 0:
             A_B += bias * np.eye(fm_size)
 
