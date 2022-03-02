@@ -37,7 +37,7 @@ class LSTD():
         policy_fun = policy()
         done = False
         timestep = 0
-        pbar = tqdm(desc="Timesteps Elapsed", total=timestep + 1)
+        pbar = tqdm(total=(self.env.timestep_limit + 1))
 
         while not done:
             action = np.random.choice(self.env.actions, p=policy_fun[state])
@@ -58,12 +58,12 @@ class LSTD():
 
 
 if __name__ == '__main__':
-    env = EnvQ(timestep_limit=10e+4, seed=SEED)
+    env = EnvQ(timestep_limit=10e+5, seed=SEED)
     lstd = LSTD(env)
     fm = FeatureMaps()
     fine_map = fm.get_fine_fm()
     coarse_map = fm.get_coarse_fm()
     pwl_map = fm.get_pwl_fm()
-    V = lstd.evaluate(policy=get_lazy_policy, feature_map=fine_map)
+    V = lstd.evaluate(policy=get_lazy_policy, feature_map=coarse_map)
     print(V)
     plot_dict(a=V, tag="Approximate Value Function")
