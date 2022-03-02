@@ -4,6 +4,18 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 
 
+def plot_q(q, tag=""):
+    action_highs = q[:, 1]
+    action_lows = q[:, 0]
+    y = list(range(len(action_highs)))
+    # plot lines
+    plt.plot(y, action_highs, label="High Action")
+    plt.plot(y, action_lows, label="Low Action")
+    plt.legend()
+    plt.title(tag)
+    plt.show()
+
+
 def plot_dict(a, tag=""):
     sns.set_theme()
     od = OrderedDict(sorted(a.items()))
