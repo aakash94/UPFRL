@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from EnvQ import EnvQ
 from IterativePolicyEvaluation import IterativePolicyEvaluation
-from Utils import plot_dict, plot_list
+from Utils import plot_dict, plot_list, plot_policy, plot_difference
 
 ACTION_LOW = 0
 ACTION_HIGH = 1
@@ -128,27 +128,6 @@ def value_iteration(env: EnvQ, gamma=DISCOUNT_FACTOR, theta=1e-8):
     time_taken_s = (time.process_time() - start_time)
     time_100 = min(time_taken_s, time_100)
     return policy, V, iteration_count, value_function_dict, time_taken_s, time_100
-
-
-def plot_difference(v1, v2, tag=""):
-    zip_object = zip(v1, v2)
-    difference = []
-    for v_1, v_2 in zip_object:
-        difference.append(v_1 - v_2)
-
-    plt.bar(range(len(difference)), difference)
-    plt.title(tag)
-    plt.show()
-
-
-def plot_policy(policy, label="", tag=""):
-    # q_high = policy[ACTION_HIGH]
-    q_high = [row[ACTION_HIGH] for row in policy]
-    y_line = list(range(STATE_SIZE))
-    plt.scatter(y_line, q_high, alpha=0.9, label=label)
-    plt.legend()
-    plt.title(tag)
-    plt.show()
 
 
 def problem1():
