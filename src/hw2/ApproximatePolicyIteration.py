@@ -55,6 +55,9 @@ class ApproximatePolicyIteration():
             policy = self.get_policy(q=q)
         return policy
 
+    def get_value_function(self, policy, feature_map):
+        v = self.lstd.evaluate(policy, feature_map, gamma=DISCOUNT_FACTOR)
+        return list(v.values())
 
 if __name__ == '__main__':
     from IterativePolicyEvaluation import IterativePolicyEvaluation
