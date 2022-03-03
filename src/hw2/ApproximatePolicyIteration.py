@@ -1,13 +1,8 @@
 from EnvQ import EnvQ
 from LSTD import LSTD
-from Utils import plot_policy, plot_dict, plot_list, plot_q
+from Utils import plot_policy
 from FeatureMaps import FeatureMaps
-from Policies import \
-    get_lazy_policy, \
-    value_iteration,\
-    get_aggressive_policy, \
-    policy_improvement, \
-    DISCOUNT_FACTOR, \
+from Policies import DISCOUNT_FACTOR, \
     STATE_SIZE, \
     NUM_ACTION
 
@@ -37,16 +32,15 @@ class ApproximatePolicyIteration():
                 service_rate = self.env.q_action[a]
                 # all rewards here are same (in the tuples above)
                 q[s][a] = s_reward + \
-                          (gamma * (1 - arrival_rate) * (service_rate * v[d_next_state])) + \
-                          ((1 - service_rate) * v[s_next_state]) + \
-                          (gamma * arrival_rate * service_rate * v[s_next_state]) + \
-                          ((1 - service_rate) * v[i_next_state])
+                          gamma * (1 - arrival_rate) * (service_rate * v[d_next_state] + \
+                          (1 - service_rate) * v[s_next_state]) + \
+                          gamma * arrival_rate * (service_rate * v[s_next_state] + \
+                          (1 - service_rate) * v[i_next_state])
         return q
 
     def get_policy(self, q):
         policy = np.ones((STATE_SIZE, NUM_ACTION))
         for s in range(self.env.max_length):
-            # policy[s] = self.normalize_data(q[s])
             policy[s] = [0,0]
             policy[s][np.argmax(q[s])] = 1
         return policy
@@ -65,26 +59,11 @@ class ApproximatePolicyIteration():
 if __name__ == '__main__':
     from IterativePolicyEvaluation import IterativePolicyEvaluation
 
-    env = EnvQ(timestep_limit=10e3)
+    env = EnvQ(timestep_limit=10e4)
     pi = ApproximatePolicyIteration(env=env, k=100)
-    op = get_lazy_policy()
-    # op = get_aggressive_policy()
-    op, _v, _steps, _checkpoints, _time, _time_100  = value_iteration(env=env)
-    ipe = IterativePolicyEvaluation(env=env)
-    v_ = ipe.evaluate(policy=op, gamma=DISCOUNT_FACTOR)
-    # plot_policy(policy=op, label="Original Policy")
-    q = pi.get_q_estimate(v=v_)
-    plot_q(q=q, tag="Q Function")
-    # p = pi.get_policy(q=q)
-    # plot_policy(policy=p, label="Derived Policy")
-    '''
     fm = FeatureMaps()
     fine_map = fm.get_fine_fm()
     coarse_map = fm.get_coarse_fm()
     pwl_map = fm.get_pwl_fm()
     policy = pi.policy_iteraion(feature_map=fine_map)
     plot_policy(policy=policy)
-    ipe = IterativePolicyEvaluation(env=env)
-    v_ = ipe.evaluate(policy=policy, gamma=DISCOUNT_FACTOR)
-    plot_list(v_,"Value Function")
-    '''
