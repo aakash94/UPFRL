@@ -2,7 +2,29 @@ from EnvQ import ACTION_HIGH, STATE_SIZE
 from collections import OrderedDict
 from matplotlib import pyplot as plt
 import seaborn as sns
+import matplotlib as mpl
 
+
+def plot_combination(dict_, tag="", type="scatter"):
+    if type == "scatter":
+        sns.set_theme(style="whitegrid")
+        sns.set_palette("Set2")
+    else:
+        sns.set_theme(style="darkgrid", font='Latin Modern Roman')
+        sns.set_palette("husl")
+    for key in dict_:
+        y = list(range(len(dict_[key])))
+        if type == "scatter":
+            plt.scatter(y, dict_[key], label=key)
+        else:
+            plt.plot(y, dict_[key], label=key)
+    plt.tight_layout()
+    if type == "scatter":
+        plt.xticks(fontsize=8, rotation=45)
+        plt.yticks(fontsize=8, rotation=45)      
+    plt.legend(prop={'size': 8})
+    plt.title(tag, fontweight="bold")
+    plt.show()
 
 def plot_q(q, tag=""):
     action_highs = q[:, 1]
@@ -47,3 +69,10 @@ def plot_difference(v1, v2, tag=""):
     plt.bar(range(len(difference)), difference)
     plt.title(tag)
     plt.show()
+
+if __name__ == '__main__':
+    d = {'help': [1, 2, 3, 4 ,6 ,7 ],
+         'im not ok': [5, 4 ,3, 10, 12, 21]}
+
+    plot_combination(d, tag="Ayuda", type="line")
+    plot_combination(d, tag="Ayuda")
