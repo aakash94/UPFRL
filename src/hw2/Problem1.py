@@ -10,9 +10,9 @@ from FeatureMaps import FeatureMaps
 from TD import TD
 from LSTD import LSTD
 from IterativePolicyEvaluation import IterativePolicyEvaluation
+from ApproximatePolicyIteration import ApproximatePolicyIteration
 
-iterations = [10e2, 10e3]
-# iterations = [10e2, 10e3, 10e4, 10e5, 10e6, 10e7]
+iterations = [10e2, 10e3, 10e4, 10e5, 10e6, 10e7]
 
 
 def get_ipe_v(policy):
@@ -81,6 +81,19 @@ def main():
     lazy_policy = get_lazy_policy()
     aggressive_policy = get_aggressive_policy()
 
+    env = EnvQ(timestep_limit=10e5)
+    fm = FeatureMaps()
+    fine_map = fm.get_fine_fm()
+    pi = ApproximatePolicyIteration(env=env, k=10)
+    api_policy_10 = pi.policy_iteraion(feature_map=fine_map)
+    plot_policy(policy=api_policy_10, label="Action", tag="API Policy 10")
+    api_v_10 = pi.get_value_function(policy=api_policy_10, feature_map=fine_map)
+
+    pi = ApproximatePolicyIteration(env=env, k=100)
+    api_policy_100 = pi.policy_iteraion(feature_map=fine_map)
+    plot_policy(policy=api_policy_100, label="Action", tag="API Policy 100")
+    api_v_100 = pi.get_value_function(policy=api_policy_100, feature_map=fine_map)
+
     # get value functions from of the policies from 1st lab
     lazy_ipe = get_ipe_v(policy=lazy_policy)
     aggressive_ipe = get_ipe_v(policy=aggressive_policy)
@@ -91,6 +104,12 @@ def main():
     # add ipe values to the dict
     lazy_td_v["Lazy_ipe"] = lazy_ipe
     lazy_lstd_v["Lazy_ipe"] = lazy_ipe
+
+    lazy_td_v["api_api_10"] = api_v_10
+    lazy_td_v["api_api_100"] = api_v_100
+
+    lazy_lstd_v["api_api_10"] = api_v_10
+    lazy_lstd_v["api_api_100"] = api_v_100
     print("Lazy Policy Done")
 
     td_lazy_fine = {}
@@ -124,6 +143,11 @@ def main():
             td_lazy_coarse[name] = values
             td_lazy_pwl[name] = values
 
+        elif 'api' in name:
+            td_lazy_fine[name] = values
+            td_lazy_coarse[name] = values
+            td_lazy_pwl[name] = values
+
     for name, values in lazy_lstd_v.items():
         if 'fine' in name:
             lstd_lazy_fine[name] = values
@@ -139,11 +163,22 @@ def main():
             lstd_lazy_coarse[name] = values
             lstd_lazy_pwl[name] = values
 
+        elif 'api' in name:
+            lstd_lazy_fine[name] = values
+            lstd_lazy_coarse[name] = values
+            lstd_lazy_pwl[name] = values
+
     # get all the new values estimates using td and lstd for aggressive policy
     aggressive_td_v, aggressive_lstd_v = get_values(policy=aggressive_policy, policy_name="Aggressive")
     # add ipe policy to the dict
     aggressive_td_v["Aggressive_ipe"] = aggressive_ipe
     aggressive_lstd_v["Aggressive_ipe"] = aggressive_ipe
+
+    aggressive_td_v["api_api_10"] = api_v_10
+    aggressive_td_v["api_api_100"] = api_v_100
+
+    aggressive_lstd_v["api_api_10"] = api_v_10
+    aggressive_lstd_v["api_api_100"] = api_v_100
     print("Aggressive Policy Done")
 
     for name, values in aggressive_td_v.items():
@@ -161,6 +196,11 @@ def main():
             td_aggressive_coarse[name] = values
             td_aggressive_pwl[name] = values
 
+        elif 'api' in name:
+            td_aggressive_fine[name] = values
+            td_aggressive_coarse[name] = values
+            td_aggressive_pwl[name] = values
+
     for name, values in aggressive_lstd_v.items():
         if 'fine' in name:
             lstd_aggressive_fine[name] = values
@@ -172,6 +212,11 @@ def main():
             lstd_aggressive_pwl[name] = values
 
         elif 'ipe' in name:
+            lstd_aggressive_fine[name] = values
+            lstd_aggressive_coarse[name] = values
+            lstd_aggressive_pwl[name] = values
+
+        elif 'api' in name:
             lstd_aggressive_fine[name] = values
             lstd_aggressive_coarse[name] = values
             lstd_aggressive_pwl[name] = values
