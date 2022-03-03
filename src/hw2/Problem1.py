@@ -11,7 +11,8 @@ from TD import TD
 from LSTD import LSTD
 from IterativePolicyEvaluation import IterativePolicyEvaluation
 
-iterations = [10e2, 10e3, 10e4]  # , 10e5, 10e6, 10e7]
+iterations = [10e2, 10e3]
+# iterations = [10e2, 10e3, 10e4, 10e5, 10e6, 10e7]
 
 
 def get_ipe_v(policy):
@@ -88,8 +89,8 @@ def main():
     lazy_td_v, lazy_lstd_v = get_values(policy=lazy_policy, policy_name="Lazy")
 
     # add ipe values to the dict
-    lazy_td_v["Lazy_IPE"] = lazy_ipe
-    lazy_lstd_v["Lazy_IPE"] = lazy_ipe
+    lazy_td_v["Lazy_ipe"] = lazy_ipe
+    lazy_lstd_v["Lazy_ipe"] = lazy_ipe
     print("Lazy Policy Done")
 
     td_lazy_fine = {}
@@ -118,6 +119,11 @@ def main():
         elif 'pwl' in name:
             td_lazy_pwl[name] = values
 
+        elif 'ipe' in name:
+            td_lazy_fine[name] = values
+            td_lazy_coarse[name] = values
+            td_lazy_pwl[name] = values
+
     for name, values in lazy_lstd_v.items():
         if 'fine' in name:
             lstd_lazy_fine[name] = values
@@ -128,11 +134,16 @@ def main():
         elif 'pwl' in name:
             lstd_lazy_pwl[name] = values
 
+        elif 'ipe' in name:
+            lstd_lazy_fine[name] = values
+            lstd_lazy_coarse[name] = values
+            lstd_lazy_pwl[name] = values
+
     # get all the new values estimates using td and lstd for aggressive policy
     aggressive_td_v, aggressive_lstd_v = get_values(policy=aggressive_policy, policy_name="Aggressive")
     # add ipe policy to the dict
-    aggressive_td_v["Aggressive_IPE"] = aggressive_ipe
-    aggressive_lstd_v["Aggressive_IPE"] = aggressive_ipe
+    aggressive_td_v["Aggressive_ipe"] = aggressive_ipe
+    aggressive_lstd_v["Aggressive_ipe"] = aggressive_ipe
     print("Aggressive Policy Done")
 
     for name, values in aggressive_td_v.items():
@@ -145,6 +156,11 @@ def main():
         elif 'pwl' in name:
             td_aggressive_pwl[name] = values
 
+        elif 'ipe' in name:
+            td_aggressive_fine[name] = values
+            td_aggressive_coarse[name] = values
+            td_aggressive_pwl[name] = values
+
     for name, values in aggressive_lstd_v.items():
         if 'fine' in name:
             lstd_aggressive_fine[name] = values
@@ -153,6 +169,11 @@ def main():
             lstd_aggressive_coarse[name] = values
 
         elif 'pwl' in name:
+            lstd_aggressive_pwl[name] = values
+
+        elif 'ipe' in name:
+            lstd_aggressive_fine[name] = values
+            lstd_aggressive_coarse[name] = values
             lstd_aggressive_pwl[name] = values
 
     TD_TAG = "TD(0)"
