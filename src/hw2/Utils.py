@@ -6,6 +6,7 @@ import matplotlib as mpl
 
 
 def plot_combination(dict_, tag="", type="scatter"):
+    # TODO: Plot both versions
     if type == "scatter":
         sns.set_theme(style="whitegrid")
         sns.set_palette("Set2")
@@ -25,6 +26,7 @@ def plot_combination(dict_, tag="", type="scatter"):
     plt.legend(prop={'size': 8})
     plt.title(tag, fontweight="bold")
     plt.show()
+    #TODO: Save Plot.
 
 def plot_q(q, tag=""):
     action_highs = q[:, 1]
@@ -53,12 +55,15 @@ def plot_list(a, tag=""):
 
 
 def plot_policy(policy, label="", tag=""):
+    # TODO: Add different Plot
+    # TODO: Plot both versions
     q_high = [row[ACTION_HIGH] for row in policy]
     y_line = list(range(STATE_SIZE))
     plt.scatter(y_line, q_high, alpha=0.9, label=label)
     plt.legend()
     plt.title(tag)
     plt.show()
+    # TODO: Save Plot
 
 
 def plot_difference(v1, v2, tag=""):
