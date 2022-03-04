@@ -1,12 +1,14 @@
-from EnvQ import ACTION_HIGH, STATE_SIZE
-from collections import OrderedDict
-from matplotlib import pyplot as plt
+import os
+
 import seaborn as sns
 import matplotlib as mpl
 
+from EnvQ import ACTION_HIGH, STATE_SIZE
+from collections import OrderedDict
+from matplotlib import pyplot as plt
 
-def plot_combination(dict_, tag="", type="scatter"):
-    # TODO: Plot both versions
+
+def plot_combination(dict_, tag="", type="scatter", default_folder="images"):
     if type == "scatter":
         sns.set_theme(style="whitegrid")
         sns.set_palette("Set2")
@@ -25,8 +27,12 @@ def plot_combination(dict_, tag="", type="scatter"):
         plt.yticks(fontsize=8, rotation=45)      
     plt.legend(prop={'size': 8})
     plt.title(tag, fontweight="bold")
+    fig1 = plt.gcf()
     plt.show()
-    #TODO: Save Plot.
+    if len(tag) >0:
+        if not os.path.exists(default_folder):
+            os.makedirs(default_folder)
+        fig1.savefig(default_folder+"/"+tag+"_"+type+'.png')
 
 def plot_q(q, tag=""):
     action_highs = q[:, 1]
@@ -46,6 +52,7 @@ def plot_dict(a, tag=""):
     plt.bar(range(len(od)), od.values())
     plt.title(tag)
     plt.show()
+    
 
 
 def plot_list(a, tag=""):
@@ -54,16 +61,25 @@ def plot_list(a, tag=""):
     plt.show()
 
 
-def plot_policy(policy, label="", tag=""):
-    # TODO: Add different Plot
-    # TODO: Plot both versions
+def plot_policy(policy, label="", tag="", type="A", default_folder="images"):
     q_high = [row[ACTION_HIGH] for row in policy]
     y_line = list(range(STATE_SIZE))
-    plt.scatter(y_line, q_high, alpha=0.9, label=label)
+    if type ==  "A":
+        sns.set_theme(style="whitegrid")
+        sns.set_palette("Set2")
+    else:
+        sns.set_theme(style="darkgrid", font='Latin Modern Roman')
+        sns.set_palette("husl")   
+    plt.scatter(y_line, q_high, alpha=0.9, label=label)    
     plt.legend()
     plt.title(tag)
+    fig1 = plt.gcf()
     plt.show()
-    # TODO: Save Plot
+    if len(tag) >0:
+        if not os.path.exists(default_folder):
+            os.makedirs(default_folder)
+        fig1.savefig(default_folder+"/"+tag+"_"+type+'.png')
+    
 
 
 def plot_difference(v1, v2, tag=""):

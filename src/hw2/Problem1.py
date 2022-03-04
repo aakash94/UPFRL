@@ -1,10 +1,7 @@
 import numpy as np
 
-from collections import defaultdict
-from tqdm import tqdm
-
 from EnvQ import EnvQ
-from Policies import get_lazy_policy, get_aggressive_policy, policy_improvement, DISCOUNT_FACTOR, plot_policy
+from Policies import get_lazy_policy, get_aggressive_policy, DISCOUNT_FACTOR, plot_policy
 from Utils import plot_combination
 from FeatureMaps import FeatureMaps
 from TD import TD
@@ -12,7 +9,7 @@ from LSTD import LSTD
 from IterativePolicyEvaluation import IterativePolicyEvaluation
 from ApproximatePolicyIteration import ApproximatePolicyIteration
 
-iterations = [10e2, 10e3, 10e4, 10e5, 10e6, 10e7]
+iterations = [1e4, 1e5, 1e6, 1e7]
 
 
 def get_ipe_v(policy):
@@ -32,7 +29,7 @@ def get_values(policy, policy_name=""):
 
     for i in iterations:
         print("Batch Size \t", i)
-        ep_string = str(i)
+        ep_string = str(int(i))
         env = EnvQ(timestep_limit=i)
         td = TD(env=env)
         lstd = LSTD(env=env)
@@ -81,17 +78,19 @@ def main():
     lazy_policy = get_lazy_policy()
     aggressive_policy = get_aggressive_policy()
 
-    env = EnvQ(timestep_limit=10e5)
+    env = EnvQ(timestep_limit=1e5)
     fm = FeatureMaps()
     fine_map = fm.get_fine_fm()
     pi = ApproximatePolicyIteration(env=env, k=10)
     api_policy_10 = pi.policy_iteraion(feature_map=fine_map)
-    plot_policy(policy=api_policy_10, label="Action", tag="API Policy 10")
+    plot_policy(policy=api_policy_10, label="Action", tag="API Policy 10", type="A")
+    plot_policy(policy=api_policy_10, label="Action", tag="API Policy 10", type="B")
     api_v_10 = pi.get_value_function(policy=api_policy_10, feature_map=fine_map)
 
     pi = ApproximatePolicyIteration(env=env, k=100)
     api_policy_100 = pi.policy_iteraion(feature_map=fine_map)
-    plot_policy(policy=api_policy_100, label="Action", tag="API Policy 100")
+    plot_policy(policy=api_policy_100, label="Action", tag="API Policy 100", type="A")
+    plot_policy(policy=api_policy_100, label="Action", tag="API Policy 100", type="B")
     api_v_100 = pi.get_value_function(policy=api_policy_100, feature_map=fine_map)
 
     # get value functions from of the policies from 1st lab
@@ -226,42 +225,54 @@ def main():
 
     tag = get_plot_name(list(td_lazy_fine.keys())[0], TD_TAG)
     plot_combination(td_lazy_fine, tag)
+    plot_combination(td_lazy_fine, tag, "lines")
 
     tag = get_plot_name(list(td_lazy_coarse.keys())[0], TD_TAG)
     plot_combination(td_lazy_coarse, tag)
+    plot_combination(td_lazy_coarse, tag, "lines")
 
     tag = get_plot_name(list(td_lazy_pwl.keys())[0], TD_TAG)
     plot_combination(td_lazy_pwl, tag)
+    plot_combination(td_lazy_pwl, tag, "lines")
 
     tag = get_plot_name(list(lstd_lazy_fine.keys())[0], LSTD_TAG)
     plot_combination(lstd_lazy_fine, tag)
+    plot_combination(lstd_lazy_fine, tag, "lines")
 
     tag = get_plot_name(list(lstd_lazy_coarse.keys())[0], LSTD_TAG)
     plot_combination(lstd_lazy_coarse, tag)
+    plot_combination(lstd_lazy_coarse, tag, "lines")
 
     tag = get_plot_name(list(lstd_lazy_pwl.keys())[0], LSTD_TAG)
     plot_combination(lstd_lazy_pwl, tag)
+    plot_combination(lstd_lazy_pwl, tag, "lines")
 
     tag = get_plot_name(list(td_aggressive_fine.keys())[0], TD_TAG)
     plot_combination(td_aggressive_fine, tag)
+    plot_combination(td_aggressive_fine, tag, "lines")
 
     tag = get_plot_name(list(td_aggressive_coarse.keys())[0], TD_TAG)
     plot_combination(td_aggressive_coarse, tag)
+    plot_combination(td_aggressive_coarse, tag, "lines")
 
     tag = get_plot_name(list(td_aggressive_pwl.keys())[0], TD_TAG)
     plot_combination(td_aggressive_pwl, tag)
+    plot_combination(td_aggressive_pwl, tag, "lines")
 
     tag = get_plot_name(list(lstd_aggressive_fine.keys())[0], LSTD_TAG)
     plot_combination(lstd_aggressive_fine, tag)
+    plot_combination(lstd_aggressive_fine, tag, "lines")
 
     tag = get_plot_name(list(lstd_aggressive_coarse.keys())[0], LSTD_TAG)
     plot_combination(lstd_aggressive_coarse, tag)
+    plot_combination(lstd_aggressive_coarse, tag, "lines")
 
     tag = get_plot_name(list(lstd_aggressive_pwl.keys())[0], LSTD_TAG)
     plot_combination(lstd_aggressive_pwl, tag)
+    plot_combination(lstd_aggressive_coarse, tag, "lines")
 
 
 if __name__ == '__main__':
-    SEED = 4
+    SEED = 666
     np.random.seed(SEED)
     main()
