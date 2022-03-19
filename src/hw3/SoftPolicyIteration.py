@@ -2,25 +2,30 @@ import random
 import numpy as np
 
 from tqdm import trange
-from matplotlib import pyplot as plt
 
 from ReplayBuffer import ReplayBuffer
 from EnvQ import EnvQ
-from Policies import get_random_policy, get_lazy_policy
 from Utils import plot_combination
+from EnvQ import EnvQ, STATE_SIZE, NUM_ACTION
 
 
 
 class SoftPolicyIteration():
 
-    def __init__(self, t=10e5, k=100, seed=42):
+    def __init__(self, t=10e2, k=100, seed=42):
         np.random.seed(seed=seed)
         random.seed(seed)
         self.t = t
         self.k = k
         self.replay_buffer = ReplayBuffer()
         self.env = EnvQ(timestep_limit=self.t)
-        self.policy = get_lazy_policy()
+        self.state_size = self.env.max_length
+        self.policy = self.get_random_policy()
+
+    def get_random_policy(self):
+        policy = np.random.rand(STATE_SIZE, NUM_ACTION)
+        policy[:, 1] = 1 - policy[:, 0]
+        return policy
 
     def collect_transitions(self):
         done = False
