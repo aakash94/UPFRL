@@ -28,6 +28,11 @@ class SoftPolicyIteration():
         policy[:, 1] = 1 - policy[:, 0]
         return policy
 
+    def get_lazy_policy(self):
+        policy = np.ones((STATE_SIZE, NUM_ACTION))
+        policy[:, 1] = 1 - policy[:, 0]
+        return policy
+
     def collect_transitions(self):
         done = False
         state = self.env.q3_reset()
