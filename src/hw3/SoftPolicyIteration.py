@@ -1,9 +1,10 @@
 from ReplayBuffer import ReplayBuffer
 from EnvQ import EnvQ
-from Policies import get_get_random_policy
+from Policies import get_random_policy, get_lazy_policy
 import random
 from tqdm import trange
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 class SoftPolicyIteration():
@@ -15,7 +16,7 @@ class SoftPolicyIteration():
         self.k = k
         self.replay_buffer = ReplayBuffer()
         self.env = EnvQ(timestep_limit=self.t)
-        self.policy = get_get_random_policy()
+        self.policy = get_lazy_policy()
 
     def collect_transitions(self):
         done = False
@@ -39,7 +40,6 @@ class SoftPolicyIteration():
         ...
 
     def iteration(self, m):
-        # TODO: Call functions and Soft Policy Iteration
         reward = 0
         for i in trange(self.k):
             reward += self.collect_transitions()
@@ -48,6 +48,22 @@ class SoftPolicyIteration():
         return reward
 
 
+def plot(r, m):
+    # TODO: Make the plot logarithmic
+    plt.plot(m, r, label="asdf")
+
+
+def q3():
+    rewards = []
+    m_val = np.logspace(-2, 2, num=100)
+
+    for m in m_val:
+        spi = SoftPolicyIteration()
+        r = spi.iteration(m=m)
+        rewards.append(r)
+
+    plot(r=rewards, m=m_val)
+
+
 if __name__ == '__main__':
-    spi = SoftPolicyIteration()
-    # TODO : figure out range of m values and call iteration.
+    q3()

@@ -14,7 +14,8 @@ STATE_SIZE = 100
 DISCOUNT_FACTOR = 0.9
 
 
-def get_get_random_policy():
+def get_random_policy():
+    # TODO: fix this
     policy = np.random.rand((STATE_SIZE, NUM_ACTION))
     policy[:, 1] = 1 - policy[:, 0]
     return policy
