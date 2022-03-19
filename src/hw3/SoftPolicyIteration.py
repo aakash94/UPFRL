@@ -31,13 +31,15 @@ class SoftPolicyIteration():
         done = False
         state = self.env.q3_reset()
         self.replay_buffer.clear()
+        total_reward = 0
         while not done:
             action = np.random.choice(a=self.env.actions, p=self.policy[state])
             next_state, reward, done, _ = self.env.step(action=action)
+            total_reward += reward
             self.replay_buffer.insert(stateV=state, actonV=action, next_stateV=next_state, rewardV=reward, doneV=done)
 
-        # TODO: Return sum of all rewards
-        return 0
+        # TODO: Return sum of all rewards: I GUESS THAT IS DONE, BUT I ONLY COSIDERED ANOTHER VARIABLE IDK IF IS OK.
+        return total_reward
 
     def get_q(self):
         # TODO: Use Replay Buffer to get the Q value function
