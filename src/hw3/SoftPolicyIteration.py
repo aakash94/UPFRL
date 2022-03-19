@@ -4,10 +4,10 @@ import numpy as np
 from tqdm import trange
 
 from ReplayBuffer import ReplayBuffer
-from EnvQ import EnvQ
+from EnvQ import EnvQ, DISCOUNT_FACTOR
 from Utils import plot_combination
 from EnvQ import EnvQ, STATE_SIZE, NUM_ACTION
-
+from LSTD import LSTD
 
 
 class SoftPolicyIteration():
@@ -21,6 +21,7 @@ class SoftPolicyIteration():
         self.env = EnvQ(timestep_limit=self.t)
         self.state_size = self.env.max_length
         self.policy = self.get_random_policy()
+        self.lstd = LSTD(env=self.env, seed=seed)
 
     def get_random_policy(self):
         policy = np.random.rand(STATE_SIZE, NUM_ACTION)
@@ -41,9 +42,8 @@ class SoftPolicyIteration():
         return total_reward
 
     def get_q(self):
-        # TODO: Use Replay Buffer to get the Q value function
-        # TODO: Maybe use LSTD and PWL feature map as in the question paper
-        ...
+        q = self.lstd.get_q_estimate(rb=self.replay_buffer.buffer)
+        return q
 
     def update_policy(self, m):
         # TODO: UPDATE policy as per formula given in the pdf
@@ -58,7 +58,6 @@ class SoftPolicyIteration():
         return reward
 
 
-
 def q3():
     rewards = []
     m_val = np.logspace(-2, 2, num=100)
@@ -70,6 +69,7 @@ def q3():
 
     dictionary = {'rewards': rewards, 'Eta Value': m_val}
     plot_combination(dictionary, scale='log')
+
 
 if __name__ == '__main__':
     q3()
