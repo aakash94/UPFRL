@@ -27,11 +27,11 @@ class LSTD():
         A_B = np.zeros((fm_size, fm_size))
         bias = 1e-9
 
-        for ind in rb.index:
-            action = rb['action'][ind]
-            state = rb['state'][ind]
-            next_state = rb['next_state'][ind]
-            reward = rb['reward'][ind]
+        for index, row in rb.iterrows():
+            action = row['action']
+            state = row['state']
+            next_state = row['next_state']
+            reward = row['reward']
 
             A_B += self.fm[state].reshape(fm_size, 1) * (self.fm[state] - gamma * self.fm[next_state])
             B_T += self.fm[state] * reward
@@ -65,7 +65,7 @@ class LSTD():
 
 if __name__ == '__main__':
     # from Policies import get_lazy_policy, get_aggressive_policy, policy_improvement, DISCOUNT_FACTOR, plot_policy
-    env = EnvQ(timestep_limit=10e+5, seed=SEED)
+    env = EnvQ(timestep_limit=10e+5)
     lstd = LSTD(env)
     fm = FeatureMaps()
     # fine_map = fm.get_fine_fm()
