@@ -1,11 +1,9 @@
-
 from ReplayBuffer import ReplayBuffer
 from EnvQ import EnvQ
 from Policies import get_get_random_policy
 import random
 from tqdm import trange
 import numpy as np
-
 
 
 class SoftPolicyIteration():
@@ -28,18 +26,28 @@ class SoftPolicyIteration():
             next_state, reward, done, _ = self.env.step(action=action)
             self.replay_buffer.insert(stateV=state, actonV=action, next_stateV=next_state, rewardV=reward, doneV=done)
 
+        # TODO: Return sum of all rewards
+        return 0
+
     def get_q(self):
         # TODO: Use Replay Buffer to get the Q value function
         # TODO: Maybe use LSTD and PWL feature map as in the question paper
         ...
 
-    def update_policy(self):
+    def update_policy(self, m):
         # TODO: UPDATE policy as per formula given in the pdf
         ...
 
-    def iteration(self):
+    def iteration(self, m):
         # TODO: Call functions and Soft Policy Iteration
+        reward = 0
         for i in trange(self.k):
-            self.collect_transitions()
+            reward += self.collect_transitions()
             self.get_q()
-            self.update_policy()
+            self.update_policy(m=m)
+        return reward
+
+
+if __name__ == '__main__':
+    spi = SoftPolicyIteration()
+    # TODO : figure out range of m values and call iteration.
