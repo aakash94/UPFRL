@@ -20,17 +20,17 @@ def plot_combination(dict_, tag="", type="scatter", default_folder="images", sca
             plt.scatter(y, dict_[key], label=key)
         else:
             plt.plot(y, dict_[key], label=key)
-    plt.tight_layout()
-    ax = plt.gca()
-    if scale == 'log':
-        ax.set_yscale('log')
-        ax.set_xscale('log')    
+    plt.tight_layout()  
     if type == "scatter":
         plt.xticks(fontsize=8, rotation=45)
         plt.yticks(fontsize=8, rotation=45)      
     plt.legend(prop={'size': 8})
     plt.title(tag, fontweight="bold")
     fig1 = plt.gcf()
+    ax = plt.gca()
+    if scale == 'log':
+        ax.set_yscale('log')
+        # ax.set_xscale('log')  
     plt.show()
     if len(tag) >0:
         if not os.path.exists(default_folder):
@@ -95,8 +95,9 @@ def plot_difference(v1, v2, tag=""):
     plt.show()
 
 if __name__ == '__main__':
-    d = {'help': [1, 2, 3, 4 ,6 ,7 ],
-         'im not ok': [5, 4 ,3, 10, 12, 21]}
+    d = {'help': [-663.3323,  -663.4832, -1150.8296],
+         'im not ok': [1.e-02, 1.e+00, 1.e+02]
+         }
 
     plot_combination(d, tag="Ayuda", type="line", scale="log")
-    plot_combination(d, tag="Ayuda")
+    # plot_combination(d, tag="Ayuda")
