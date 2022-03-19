@@ -1,5 +1,7 @@
 import random
+import math
 import numpy as np
+
 from tqdm import trange
 from ReplayBuffer import ReplayBuffer
 from EnvQ import EnvQ, DISCOUNT_FACTOR
@@ -44,16 +46,24 @@ class SoftPolicyIteration():
         q = lstd.get_q_estimate(rb=self.replay_buffer.buffer)
         return q
 
-    def update_policy(self, m):
-        # TODO: UPDATE self.policy as per formula given in the pdf
-        ...
+    def update_policy(self, eta):
+        policy = np.ones((STATE_SIZE, NUM_ACTION))
+        q = self.get_q()
+        for s in range(self.env.max_length):
+            total_sum = 0
+            policy[s] = [0,0]
+            for action in range(len(policy[s])):
+                total_sum += self.policy[s][action]*math.exp(eta*q[s][action])
+            for action in range(len(policy[s])):
+                policy[s][action] = self.policy[s][action]*math.exp(eta*q[s][action])/total_sum
+        self.policy = policy
 
-    def iteration(self, m):
+    def iteration(self, eta):
         reward = 0
         for i in trange(self.k):
             reward += self.collect_transitions()
             self.get_q()
-            self.update_policy(m=m)
+            self.update_policy(m=eta)
         return reward
 
 
