@@ -3,7 +3,7 @@ import pandas as pd
 
 class ReplayBuffer(object):
 
-    def __init__(self, capacity):
+    def __init__(self, capacity=10e5 + 1):
 
         r_buff_header = ['state', 'action', 'next_state', 'reward', 'done']
         self.capacity = capacity
@@ -35,6 +35,9 @@ class ReplayBuffer(object):
             return self.buffer
         else:
             return self.buffer.sample(batch_size)
+
+    def clear(self):
+        self.buffer = self.buffer[0:0]
 
     def __len__(self):
         return self.buffer.shape[0]

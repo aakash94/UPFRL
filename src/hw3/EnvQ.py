@@ -146,6 +146,11 @@ class EnvQ(gym.Env):
         print(c_d, "\t", c_s, "\t", c_i)
         return count
 
+    def q3_reset(self):
+        # Same as normal reset, but the state is not changed.
+        self.timestep_count = 0
+        return self.state
+
 
 if __name__ == '__main__':
     print("Hello World")

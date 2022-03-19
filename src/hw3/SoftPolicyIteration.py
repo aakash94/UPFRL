@@ -1,8 +1,11 @@
+
 from ReplayBuffer import ReplayBuffer
 from EnvQ import EnvQ
 from Policies import get_get_random_policy
 import random
+from tqdm import trange
 import numpy as np
+
 
 
 class SoftPolicyIteration():
@@ -18,7 +21,7 @@ class SoftPolicyIteration():
 
     def collect_transitions(self):
         done = False
-        state = self.env.reset()
+        state = self.env.q3_reset()
         self.replay_buffer.clear()
         while not done:
             action = np.random.choice(a=self.env.actions, p=self.policy[state])
@@ -36,4 +39,7 @@ class SoftPolicyIteration():
 
     def iteration(self):
         # TODO: Call functions and Soft Policy Iteration
-        ...
+        for i in trange(self.k):
+            self.collect_transitions()
+            self.get_q()
+            self.update_policy()
