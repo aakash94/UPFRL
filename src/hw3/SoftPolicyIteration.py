@@ -37,8 +37,7 @@ class SoftPolicyIteration():
             next_state, reward, done, _ = self.env.step(action=action)
             total_reward += reward
             self.replay_buffer.insert(stateV=state, actonV=action, next_stateV=next_state, rewardV=reward, doneV=done)
-
-        # TODO: Return sum of all rewards: I GUESS THAT IS DONE, BUT I ONLY COSIDERED ANOTHER VARIABLE IDK IF IS OK.
+        # total_reward = self.replay_buffer.buffer['reward'].sum()
         return total_reward
 
     def get_q(self):
