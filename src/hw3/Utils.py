@@ -1,14 +1,13 @@
 import os
 
 import seaborn as sns
-import matplotlib as mpl
 
 from EnvQ import ACTION_HIGH, STATE_SIZE
 from collections import OrderedDict
 from matplotlib import pyplot as plt
 
 
-def plot_combination(dict_, tag="", type="scatter", default_folder="images"):
+def plot_combination(dict_, tag="", type="scatter", default_folder="images", scale='normal'):
     if type == "scatter":
         sns.set_theme(style="whitegrid")
         sns.set_palette("Set2")
@@ -22,6 +21,10 @@ def plot_combination(dict_, tag="", type="scatter", default_folder="images"):
         else:
             plt.plot(y, dict_[key], label=key)
     plt.tight_layout()
+    ax = plt.gca()
+    if scale == 'log':
+        ax.set_yscale('log')
+        ax.set_xscale('log')    
     if type == "scatter":
         plt.xticks(fontsize=8, rotation=45)
         plt.yticks(fontsize=8, rotation=45)      
@@ -95,5 +98,5 @@ if __name__ == '__main__':
     d = {'help': [1, 2, 3, 4 ,6 ,7 ],
          'im not ok': [5, 4 ,3, 10, 12, 21]}
 
-    plot_combination(d, tag="Ayuda", type="line")
+    plot_combination(d, tag="Ayuda", type="line", scale="log")
     plot_combination(d, tag="Ayuda")

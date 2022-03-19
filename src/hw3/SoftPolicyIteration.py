@@ -1,10 +1,14 @@
+import random
+import numpy as np
+
+from tqdm import trange
+from matplotlib import pyplot as plt
+
 from ReplayBuffer import ReplayBuffer
 from EnvQ import EnvQ
 from Policies import get_random_policy, get_lazy_policy
-import random
-from tqdm import trange
-import numpy as np
-from matplotlib import pyplot as plt
+from Utils import plot_combination
+
 
 
 class SoftPolicyIteration():
@@ -48,10 +52,6 @@ class SoftPolicyIteration():
         return reward
 
 
-def plot(r, m):
-    # TODO: Make the plot logarithmic
-    plt.plot(m, r, label="asdf")
-
 
 def q3():
     rewards = []
@@ -62,8 +62,8 @@ def q3():
         r = spi.iteration(m=m)
         rewards.append(r)
 
-    plot(r=rewards, m=m_val)
-
+    dictionary = {'rewards': rewards, 'Eta Value': m_val}
+    plot_combination(dictionary, scale='log')
 
 if __name__ == '__main__':
     q3()
