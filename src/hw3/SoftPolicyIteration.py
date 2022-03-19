@@ -12,7 +12,7 @@ from LSTD import LSTD
 
 class SoftPolicyIteration():
 
-    def __init__(self, t=10e2, k=100, seed=42):
+    def __init__(self, t=1e3, k=10, seed=42):
         self.seed = seed
         np.random.seed(seed=seed)
         random.seed(seed)
@@ -69,11 +69,11 @@ class SoftPolicyIteration():
 
 def q3():
     rewards = []
-    m_val = np.logspace(-2, 2, num=100)
+    m_val = np.logspace(-2, 2, num=3)
 
     for m in m_val:
         spi = SoftPolicyIteration()
-        r = spi.iteration(m=m)
+        r = spi.iteration(eta=m)
         rewards.append(r)
 
     dictionary = {'rewards': rewards, 'Eta Value': m_val}
