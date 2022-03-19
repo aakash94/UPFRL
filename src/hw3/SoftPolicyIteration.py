@@ -38,6 +38,7 @@ class SoftPolicyIteration():
             next_state, reward, done, _ = self.env.step(action=action)
             total_reward += reward
             self.replay_buffer.insert(stateV=state, actonV=action, next_stateV=next_state, rewardV=reward, doneV=done)
+            state = next_state
         # total_reward = self.replay_buffer.buffer['reward'].sum()
         return total_reward
 
@@ -63,7 +64,7 @@ class SoftPolicyIteration():
         for i in trange(self.k):
             reward += self.collect_transitions()
             self.get_q()
-            self.update_policy(m=eta)
+            self.update_policy(eta=eta)
         return reward
 
 
