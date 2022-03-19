@@ -1,8 +1,6 @@
 import random
 import numpy as np
-
 from tqdm import trange
-
 from ReplayBuffer import ReplayBuffer
 from EnvQ import EnvQ, DISCOUNT_FACTOR
 from Utils import plot_combination
@@ -13,6 +11,7 @@ from LSTD import LSTD
 class SoftPolicyIteration():
 
     def __init__(self, t=10e2, k=100, seed=42):
+        self.seed = seed
         np.random.seed(seed=seed)
         random.seed(seed)
         self.t = t
@@ -21,7 +20,6 @@ class SoftPolicyIteration():
         self.env = EnvQ(timestep_limit=self.t)
         self.state_size = self.env.max_length
         self.policy = self.get_random_policy()
-        self.lstd = LSTD(env=self.env, seed=seed)
 
     def get_random_policy(self):
         policy = np.random.rand(STATE_SIZE, NUM_ACTION)
@@ -42,11 +40,12 @@ class SoftPolicyIteration():
         return total_reward
 
     def get_q(self):
-        q = self.lstd.get_q_estimate(rb=self.replay_buffer.buffer)
+        lstd = LSTD(env=self.env, seed=self.seed)
+        q = lstd.get_q_estimate(rb=self.replay_buffer.buffer)
         return q
 
     def update_policy(self, m):
-        # TODO: UPDATE policy as per formula given in the pdf
+        # TODO: UPDATE self.policy as per formula given in the pdf
         ...
 
     def iteration(self, m):
