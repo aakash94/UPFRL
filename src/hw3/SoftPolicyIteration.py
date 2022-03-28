@@ -81,7 +81,7 @@ class SoftPolicyIteration():
             self.update_policy(eta=eta)
 
             # Hack to run faster
-            dq.append(self.policy)
+            dq.append(np.copy(self.policy))
             if self.all_policy_same(dq=dq):
                 reward += (r * (self.k - i))
                 break
@@ -96,8 +96,10 @@ class SoftPolicyIteration():
         difference_threshold = 1e-6 # Hack value
         p = dq[0]
         for ps in dq:
-            diff = np.absolute(p - ps).sum()
-            if diff > difference_threshold:
+            diff_between_arrays = np.absolute(np.array(p) - np.array(ps))
+            diff = np.sum(diff_between_arrays)
+            real_difference_flag = diff > difference_threshold
+            if real_difference_flag:
                 return False
         return True
 
