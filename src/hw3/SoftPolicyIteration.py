@@ -56,16 +56,17 @@ class SoftPolicyIteration():
     def update_policy(self, eta):
         policy = np.ones((STATE_SIZE, NUM_ACTION))
         q = self.get_q()
+        exponent_clamp = 1e-10  # Hack
         for s in range(self.env.max_length):
             total_sum = 0
             policy[s] = [0, 0]
             for action in range(len(policy[s])):
                 exponen = math.exp(eta * q[s][action])
-                if exponen < 1e-10: exponen = 1e-10
+                if exponen < exponent_clamp: exponen = exponent_clamp
                 total_sum += self.policy[s][action] * exponen
             for action in range(len(policy[s])):
                 exponen = math.exp(eta * q[s][action])
-                if exponen < 1e-10: exponen = 1e-10
+                if exponen < exponent_clamp: exponen = exponent_clamp
                 total_by_action = self.policy[s][action] * exponen / total_sum
                 policy[s][action] = total_by_action
         self.policy = policy
