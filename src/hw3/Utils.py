@@ -36,6 +36,34 @@ def plot_combination(dict_, tag="", type="scatter", default_folder="images", sca
         if not os.path.exists(default_folder):
             os.makedirs(default_folder)
         fig1.savefig(default_folder+"/"+tag+"_"+type+'.png')
+        
+        
+def plot_x_y(x, y, type="scatter", tag="", scale='normal', default_folder="images"):
+    if type == "scatter":
+        sns.set_theme(style="whitegrid")
+        sns.set_palette("Set2")
+    else:
+        sns.set_theme(style="darkgrid", font='Latin Modern Roman')
+        sns.set_palette("husl")
+    if type == "scatter":
+        plt.scatter(x, y)
+    else:
+        plt.plot(x, y)
+    plt.tight_layout()  
+    if type == "scatter":
+        plt.xticks(fontsize=8, rotation=45)
+        plt.yticks(fontsize=8, rotation=45)      
+    plt.legend(prop={'size': 8})
+    plt.title(tag, fontweight="bold")
+    fig1 = plt.gcf()
+    ax = plt.gca()
+    if scale == 'log':
+        ax.set_xscale('log')
+    plt.show()
+    if len(tag) >0:
+        if not os.path.exists(default_folder):
+            os.makedirs(default_folder)
+        fig1.savefig(default_folder+"/"+tag+"_"+type+'.png')
 
 def plot_q(q, tag=""):
     action_highs = q[:, 1]

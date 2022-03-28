@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import trange
 from ReplayBuffer import ReplayBuffer
 from EnvQ import EnvQ, DISCOUNT_FACTOR
-from Utils import plot_combination
+from Utils import plot_x_y
 from EnvQ import EnvQ, STATE_SIZE, NUM_ACTION
 from LSTD import LSTD
 
@@ -59,9 +59,14 @@ class SoftPolicyIteration():
             total_sum = 0
             policy[s] = [0,0]
             for action in range(len(policy[s])):
-                total_sum += self.policy[s][action]*math.exp(eta*q[s][action])
+                exponen = math.exp(eta*q[s][action])
+                if exponen < 1e-10: exponen = 1e-10
+                total_sum += self.policy[s][action]*exponen
             for action in range(len(policy[s])):
-                policy[s][action] = self.policy[s][action]*math.exp(eta*q[s][action])/total_sum
+                exponen = math.exp(eta*q[s][action])
+                if exponen < 1e-10: exponen = 1e-10
+                total_by_action = self.policy[s][action]*exponen/total_sum
+                policy[s][action] = total_by_action
         self.policy = policy
 
     def iteration(self, eta):
@@ -75,14 +80,16 @@ class SoftPolicyIteration():
 
 def q3():
     rewards = []
-    m_val = np.logspace(-2, 2, num=3) # 100
+    m_val = np.logspace(-2, 2, num=5) # 100
+    # m_val = [1e2]
 
     for m in m_val:
         spi = SoftPolicyIteration()
         r = spi.iteration(eta=m)
         rewards.append(r)
-    plot_combination({ 'Eta Value': m_val}, scale='log')
-    plot_combination({'rewards': rewards})
+    print(rewards)
+    print(m_val)
+    plot_x_y(m_val, rewards, scale='log', tag="Soft Policy Iteration")
 
 
 if __name__ == '__main__':
