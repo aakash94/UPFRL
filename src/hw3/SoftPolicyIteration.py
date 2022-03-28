@@ -56,7 +56,7 @@ class SoftPolicyIteration():
     def update_policy(self, eta):
         policy = np.ones((STATE_SIZE, NUM_ACTION))
         q = self.get_q()
-        exponent_clamp = 1e-10  # Hack
+        exponent_clamp = 1e-20  # Hack
         for s in range(self.env.max_length):
             total_sum = 0
             policy[s] = [0, 0]
@@ -93,10 +93,11 @@ class SoftPolicyIteration():
         items_count = len(dq)
         if items_count < capacity:
             return False
-        difference_threshold = 1e-6
+        difference_threshold = 1e-6 # Hack value
         p = dq[0]
         for ps in dq:
-            if np.absolute(p - ps).sum() > difference_threshold:
+            diff = np.absolute(p - ps).sum()
+            if diff > difference_threshold:
                 return False
         return True
 
@@ -107,7 +108,7 @@ def q3():
     # m_val = [1e2]
 
     for m in m_val:
-        spi = SoftPolicyIteration(t=1e3, k=10)
+        spi = SoftPolicyIteration(t=1e3, k=100)
         r = spi.iteration(eta=m)
         rewards.append(r)
     print(rewards)
