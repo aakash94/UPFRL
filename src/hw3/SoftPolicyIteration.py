@@ -8,11 +8,12 @@ from EnvQ import EnvQ, DISCOUNT_FACTOR
 from Utils import plot_x_y
 from EnvQ import EnvQ, STATE_SIZE, NUM_ACTION
 from LSTD import LSTD
+from collections import deque
 
 
 class SoftPolicyIteration():
 
-    def __init__(self, t=1e3, k=10, seed=42): # t=1e5, k = 100
+    def __init__(self, t=1e5, k=100, seed=42):
         self.seed = seed
         np.random.seed(seed=seed)
         random.seed(seed)
@@ -57,34 +58,55 @@ class SoftPolicyIteration():
         q = self.get_q()
         for s in range(self.env.max_length):
             total_sum = 0
-            policy[s] = [0,0]
+            policy[s] = [0, 0]
             for action in range(len(policy[s])):
-                exponen = math.exp(eta*q[s][action])
+                exponen = math.exp(eta * q[s][action])
                 if exponen < 1e-10: exponen = 1e-10
-                total_sum += self.policy[s][action]*exponen
+                total_sum += self.policy[s][action] * exponen
             for action in range(len(policy[s])):
-                exponen = math.exp(eta*q[s][action])
+                exponen = math.exp(eta * q[s][action])
                 if exponen < 1e-10: exponen = 1e-10
-                total_by_action = self.policy[s][action]*exponen/total_sum
+                total_by_action = self.policy[s][action] * exponen / total_sum
                 policy[s][action] = total_by_action
         self.policy = policy
 
     def iteration(self, eta):
         reward = 0
+        dq = deque([], 5)
         for i in trange(self.k):
-            reward += self.collect_transitions()
+            r = self.collect_transitions()
+            reward += r
             self.get_q()
             self.update_policy(eta=eta)
+
+            # Hack to run faster
+            dq.append(self.policy)
+            if self.all_policy_same(dq=dq):
+                reward += (r * (self.k - i))
+                break
+            # Hack over
         return reward
+
+    def all_policy_same(self, dq: deque):
+        capacity = dq.maxlen
+        items_count = len(dq)
+        if items_count < capacity:
+            return False
+        difference_threshold = 1e-6
+        p = dq[0]
+        for ps in dq:
+            if np.absolute(p - ps).sum() > difference_threshold:
+                return False
+        return True
 
 
 def q3():
     rewards = []
-    m_val = np.logspace(-2, 2, num=5) # 100
+    m_val = np.logspace(-2, 2, num=5)  # 100
     # m_val = [1e2]
 
     for m in m_val:
-        spi = SoftPolicyIteration()
+        spi = SoftPolicyIteration(t=1e3, k=10)
         r = spi.iteration(eta=m)
         rewards.append(r)
     print(rewards)
