@@ -48,27 +48,33 @@ class SoftPolicyIteration():
         # total_reward = self.replay_buffer.buffer['reward'].sum()
         return total_reward
 
-    def get_q(self):
+    def get_q(self, shift_q=True):
         lstd = LSTD(env=self.env, seed=self.seed)
         q = lstd.get_q_estimate(rb=self.replay_buffer.buffer)
+        if shift_q:
+            for s in range(self.env.max_length):
+                actions = q[s]
+                max_val = np.max(actions)
+                q[s] -= max_val
         return q
 
     def update_policy(self, eta):
         policy = np.ones((STATE_SIZE, NUM_ACTION))
         q = self.get_q()
-        exponent_clamp = 1e-20  # Hack
+
         for s in range(self.env.max_length):
             total_sum = 0
             policy[s] = [0, 0]
+
             for action in range(len(policy[s])):
-                exponen = math.exp(eta * q[s][action])
-                if exponen < exponent_clamp: exponen = exponent_clamp
-                total_sum += self.policy[s][action] * exponen
+                exponent = math.exp(eta * q[s][action])
+                total_sum += self.policy[s][action] * exponent
+
             for action in range(len(policy[s])):
-                exponen = math.exp(eta * q[s][action])
-                if exponen < exponent_clamp: exponen = exponent_clamp
-                total_by_action = self.policy[s][action] * exponen / total_sum
+                exponent = math.exp(eta * q[s][action])
+                total_by_action = self.policy[s][action] * exponent / total_sum
                 policy[s][action] = total_by_action
+
         self.policy = policy
 
     def iteration(self, eta):
@@ -93,7 +99,7 @@ class SoftPolicyIteration():
         items_count = len(dq)
         if items_count < capacity:
             return False
-        difference_threshold = 1e-6 # Hack value
+        difference_threshold = 1e-6  # Hack value
         p = dq[0]
         for ps in dq:
             diff_between_arrays = np.absolute(np.array(p) - np.array(ps))
