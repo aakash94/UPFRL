@@ -53,7 +53,7 @@ def plot_x_y(x, y, type="scatter", tag="", scale='normal', default_folder="image
     if type == "scatter":
         plt.xticks(fontsize=8, rotation=45)
         plt.yticks(fontsize=8, rotation=45)      
-    plt.legend(prop={'size': 8})
+    # plt.legend(prop={'size': 8})
     plt.title(tag, fontweight="bold")
     fig1 = plt.gcf()
     ax = plt.gca()

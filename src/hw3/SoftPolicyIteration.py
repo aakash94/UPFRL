@@ -112,16 +112,17 @@ class SoftPolicyIteration():
 
 def q3():
     rewards = []
-    m_val = np.logspace(-2, 2, num=5)  # 100
-    # m_val = [1e2]
+    m_val = np.logspace(-2, 2, num=10)  # 100
+    # m_val = [1e-2]
 
     for m in m_val:
-        spi = SoftPolicyIteration(t=1e3, k=100)
+        spi = SoftPolicyIteration(t=1e4, k=100)
         r = spi.iteration(eta=m)
         rewards.append(r)
     print(rewards)
     print(m_val)
     plot_x_y(m_val, rewards, scale='log', tag="Soft Policy Iteration")
+    plot_x_y(m_val, rewards, scale='log', tag="Soft Policy Iteration",  type="other")
 
 
 if __name__ == '__main__':
